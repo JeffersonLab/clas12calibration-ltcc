@@ -24,6 +24,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import modules.TimeCalibration;
+import modules.SPECalibration;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
@@ -122,6 +123,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         
         // create module viewer
         modules.add(new TimeCalibration(detectorView,"TimeCalibration"));
+        modules.add(new SPECalibration(detectorView,"SPECalibration"));
         modulePanel = new JTabbedPane();
         for(int k=0; k<modules.size(); k++) {
             modulePanel.add(modules.get(k).getName(),modules.get(k).getView());
