@@ -50,7 +50,7 @@ public class SPECalibration extends CalibrationModule {
      
                     // initialize data group
                     
-                    H1F speADC = new H1F("speADC_" + iSect + "_" + iLay + "_" + iComp, 100, 0.0, 1000);
+                    H1F speADC = new H1F("speADC_" + iSect + "_" + iLay + "_" + iComp, 100, 0.0, 5000);
                     speADC.setTitleX("ADC");
                     speADC.setTitleY("counts");
                     speADC.setTitle("spe ADC Channel (" + iSect + "," + iLay + "," + iComp +")");
