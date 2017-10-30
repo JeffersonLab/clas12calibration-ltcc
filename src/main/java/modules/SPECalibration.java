@@ -40,8 +40,7 @@ public class SPECalibration extends CalibrationModule {
         
         for (int iSect : this.getDetector().getSectors()) {
             for(int iLay=1; iLay<=this.getLayers(); iLay++) {
-                for(int iComp=1; iComp<=this.getSegments(); iComp++) {      
-//                    System.out.println(iSect + "_" + iLay + "_" + iComp);
+                for(int iComp=1; iComp<=this.getSegments(); iComp++) { 
                     // initialize calibration table
                     this.getCalibrationTable().addEntry(iSect, iLay, iComp);
                     //getCalibrationTable().setDoubleValue(0., "offset", iSect, iLay, iComp);
@@ -49,7 +48,7 @@ public class SPECalibration extends CalibrationModule {
                     //getCalibrationTable().setDoubleValue(1., "resolution", iSect, iLay, iComp);
      
                     // initialize data group
-                    
+                     System.out.println(iLay);
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iLay + "_" + iComp, 100, 0.0, 5000);
                     speADC.setTitleX("ADC");
                     speADC.setTitleY("counts");
@@ -73,13 +72,15 @@ public class SPECalibration extends CalibrationModule {
         return Arrays.asList(getCalibrationTable());
     }
    
-
+    public int getNEvents(int isec, int ilay, int icomp) {
+        return this.getDataGroup().getItem(isec, ilay, icomp).getH1F("speADC_" + isec + "_" + ilay + "_" + icomp).getEntries();
+    }
     public int nevents;
     
     @Override
     public void processEvent(DataEvent event) {
         nevents++;  
-        
+        //System.out.println(nevents);
         if(event.hasBank("LTCC::adc")==true){
 	    DataBank bank = event.getBank("LTCC::adc");
 	    int rows = bank.rows();
@@ -88,8 +89,8 @@ public class SPECalibration extends CalibrationModule {
                 int layer   = bank.getByte("layer",loop);
                 int component = bank.getShort("component", loop);
                 int adc = bank.getInt("ADC", loop);
-                float time = bank.getFloat("time", loop); //ns
-                if(sector>0 && layer>0 && component>0) {
+               
+                if(sector>0 && layer>0  && component>0) {
                 this.getDataGroup().getItem(sector, layer, component).getH1F("speADC_" + sector + "_" + layer + "_" + component).fill(adc);
                 }
             }
@@ -103,13 +104,28 @@ public class SPECalibration extends CalibrationModule {
         for (int iSect : this.getDetector().getSectors()) {
             for(int iLay=1; iLay<=this.getLayers(); iLay++) {
                 for(int iComp=1; iComp<=this.getSegments(); iComp++) { 
-                    H1F speADC = this.getDataGroup().getItem(iSect, iLay, iComp).getH1F("speADC_" + iSect + "_" + iLay + "_" + iComp);
-                    H1F speADC1 = this.getDataGroup().getItem(iSect, iLay, iComp).getH1F("speADC_" + iSect + "_" + iLay + "_" + iComp);
-                    H1F speADC2 = this.getDataGroup().getItem(iSect, iLay, iComp).getH1F("speADC_" + iSect + "_" + iLay + "_" + iComp);          
+                    H1F speADC = this.getDataGroup().getItem(iSect, iLay, iComp).getH1F("speADC_" + iSect + "_" + iLay + "_" + iComp);         
                 }
             }
         }
         getCalibrationTable().fireTableDataChanged();
+    }
+    
+    @Override
+    public Color getColor(DetectorShape2D dsd) {
+        // show summary
+        int sector = dsd.getDescriptor().getSector();
+        int layer = dsd.getDescriptor().getLayer();
+        int key = dsd.getDescriptor().getComponent();
+        ColorPalette palette = new ColorPalette();
+        Color col = new Color(100, 100, 100);
+        int nent = this.getNEvents(sector, layer, key);
+        if (nent > 0) {
+            col = palette.getColor3D(nent, this.getnProcessed(), true);
+        }
+        
+//        col = new Color(100, 0, 0);
+        return col;
     }
     
     @Override
