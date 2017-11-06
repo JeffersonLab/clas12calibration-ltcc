@@ -21,6 +21,7 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.groot.math.F1D;
 import org.jlab.groot.data.GraphErrors;
 import org.jlab.groot.fitter.DataFitter;
+import org.jlab.utils.groups.IndexedList;
 
 
 /**
@@ -48,18 +49,14 @@ public class SPECalibration extends CalibrationModule {
                     //getCalibrationTable().setDoubleValue(1., "resolution", iSect, iLay, iComp);
      
                     // initialize data group
-                     System.out.println(iLay);
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iLay + "_" + iComp, 100, 0.0, 5000);
                     speADC.setTitleX("ADC");
                     speADC.setTitleY("counts");
                     speADC.setTitle("spe ADC Channel (" + iSect + "," + iLay + "," + iComp +")");
                     speADC.setFillColor(3);
                     
-             
-                    
-         
-                    DataGroup dg = new DataGroup(2, 2);
-                    dg.addDataSet(speADC, 0);
+                    DataGroup dg = new DataGroup(2,2);
+                    dg.addDataSet(speADC, (iComp-1)%4);
                     this.getDataGroup().add(dg,iSect, iLay, iComp);
                 }
             }
@@ -91,20 +88,41 @@ public class SPECalibration extends CalibrationModule {
                 int adc = bank.getInt("ADC", loop);
                
                 if(sector>0 && layer>0  && component>0) {
-                this.getDataGroup().getItem(sector, layer, component).getH1F("speADC_" + sector + "_" + layer + "_" + component).fill(adc);
+                this.getDataGroup().getItem(sector,layer,component).getH1F("speADC_" + sector + "_" + layer + "_" + component).fill(adc);
                 }
             }
         }
     }
+   
+    public void processShape(DetectorShape2D dsd) {
+        // plot histos for the specific component
+        int sector = dsd.getDescriptor().getSector();
+        int layer  = dsd.getDescriptor().getLayer();
+        int paddle = dsd.getDescriptor().getComponent();
+        System.out.println("Selected shape " + sector + " " + layer + " " + paddle);
+        IndexedList<DataGroup> group = this.getDataGroup();        
+        
+        
+        if(group.hasItem(sector,layer,paddle)==true){
+            if((paddle-1)%4==0){
+                        this.getCanvas().clear();
+            }     
+            //this.getCanvas().clear();
+            this.getCanvas().draw(this.getDataGroup().getItem(sector,layer,paddle));
+            this.getCanvas().update();
+            
+        } else {
+            System.out.println(" ERROR: can not find the data group");
+        }       
+    }
     
-
     public void analyze() {
 //        System.out.println("Analyzing");
         
         for (int iSect : this.getDetector().getSectors()) {
             for(int iLay=1; iLay<=this.getLayers(); iLay++) {
                 for(int iComp=1; iComp<=this.getSegments(); iComp++) { 
-                    H1F speADC = this.getDataGroup().getItem(iSect, iLay, iComp).getH1F("speADC_" + iSect + "_" + iLay + "_" + iComp);         
+                    H1F speADC = this.getDataGroup().getItem(iSect,iLay,iComp).getH1F("speADC_" + iSect + "_" + iLay + "_" + iComp);              
                 }
             }
         }
