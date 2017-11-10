@@ -251,11 +251,11 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
             this.getCanvas().clear();
             this.getCanvas().draw(this.getDataGroup().getItem(sector,layer,paddle));
             this.getCanvas().update();
-        } else {
+            } else {
             System.out.println(" ERROR: can not find the data group");
         }       
     }
-  
+    
     public void readDataGroup(TDirectory dir) {
         String folder = this.getName() + "/";
         System.out.println("Reading from: " + folder);
