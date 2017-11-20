@@ -77,7 +77,13 @@ public class SPECalibration extends CalibrationModule {
     }
 
     public int getNEvents(int isec, int order, int icomp) {
-        return this.getDataGroup().getItem(isec, order, icomp).getH1F("speADC_" + isec + "_" + order + "_" + icomp).getEntries();
+        if (icomp < 14) {
+            return this.getDataGroup().getItem(isec, order, icomp).getH1F("speADC_" + isec + "_" + order + "_" + icomp).getEntries();
+        } else {
+            int maxComponent = 13;
+            return this.getDataGroup().getItem(isec, order, maxComponent).getH1F("speADC_" + isec + "_" + order + "_" + maxComponent).getEntries();
+        }
+
     }
     public int nevents;
 
@@ -134,6 +140,7 @@ public class SPECalibration extends CalibrationModule {
             }
 
             int segN = paddle;
+            if(segN > 13) segN = 13;
             for (paddle = segN; paddle < segN + 6; paddle++) {
                 this.getCanvas().divide(3, 2);
                 this.getCanvas().cd((paddle - segN) % 6);
