@@ -1,5 +1,11 @@
 #!/bin/sh -f
 
+hostname=$(hostname)
+
+if [[ $hostname == "clonsl2.jlab.org" ]]; then
+	COATJAVA=/home/clasrun/CLARA/4a.8.3/plugins/clas12 ; export COATJAVA
+fi
+
 # distribution directory: same as launched
 DISTRO_DIR=`dirname $0`; export DISTRO_DIR
 CLAS12DIR=$COATJAVA ;    export CLAS12DIR
