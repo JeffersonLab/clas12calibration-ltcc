@@ -54,16 +54,24 @@ public class SPECalibration extends CalibrationModule {
                     speADC.setTitleY("counts");
                     speADC.setTitle("spe ADC Channel (" + iSect + "," + iOrde + "," + iComp + ")");
                     speADC.setFillColor(3);
-                    F1D fADC = new F1D("fADC_" + iSect + "_" + iOrde + "_" + iComp, "[amp]*gaus(x,[mean],[sigma])", 120, 270);
-                    fADC.setParameter(0, 0.0);
-                    fADC.setParameter(1, 0.0);
-                    fADC.setParameter(2, 20.0);
-                    fADC.setLineColor(2);
-                    fADC.setLineWidth(2);
+		    // Exponential fit function with 2 parameters
+                    F1D fADCe = new F1D("fADCe_" + iSect + "_" + iOrde + "_" + iComp, "exp(x,[p0],[p1])", 100, 3000);
+                    fADCe.setParameter(0, 0.0);
+                    fADCe.setParameter(1, 0.0);
+                    fADCe.setLineColor(2);
+                    fADCe.setLineWidth(2);
+		    // Poissonian fit function needs to be deifned in CustomFunction.java with 3 parameters
+	   	    poissonf fADC = new poissonf("fADCp_" + iSect + "_" + iOrde + "_" + iComp, 100, 2000);
+		    fADCp.setParameter(0, 0.0);
+		    fADCp.setParameter(1, 0.0);
+		    fADCp.setParameter(2, 0.0);
+                    fADCp.setLineColor(1);
+                    fADCp.setLineWidth(2);
 
                     DataGroup dg = new DataGroup(3, 2);
                     dg.addDataSet(speADC, (iComp - 1) % 6);
-                    dg.addDataSet(fADC, (iComp - 1) % 6);
+                    dg.addDataSet(fADCe, (iComp - 1) % 6); //added expo func to dg
+ 		    dg.addDataSet(fADCp, (iComp - 1) % 6); //added poisson func to dg
                     this.getDataGroup().add(dg, iSect, iOrde, iComp);
                 }
             }
@@ -114,9 +122,10 @@ public class SPECalibration extends CalibrationModule {
             for (int iOrde = 0; iOrde < 1; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
                     H1F speADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("speADC_" + iSect + "_" + iOrde + "_" + iComp);
-                    /*F1D fADC = this.getDataGroup().getItem(iSect,iLay,iComp).getF1D("fADC_" + iSect + "_" + iLay + "_" + iComp);
-                    this.initADCgaussFitPar(fADC, speADC);
-                    DataFitter.fit(fADC, speADC, "LQ");*/
+                    F1D fADCe = this.getDataGroup().getItem(iSect, iOrde ,iComp).getF1D("fADCe_" + iSect + "_" + iOrde + "_" + iComp);
+		    poissonf fADCp = this.getDataGroup().getItem(iSect, iOrde ,iComp).getF1D("fADCp_" + iSect + "_" + iOrde + "_" + iComp);
+                    this.initADCgaussFitPar(fADCe, speADC); //using only exponential for now, needs to be changed with expo+poissonian later
+                    DataFitter.fit(fADC, speADC, "LQ");
                 }
             }
         }
@@ -145,7 +154,9 @@ public class SPECalibration extends CalibrationModule {
                 this.getCanvas().divide(3, 2);
                 this.getCanvas().cd((paddle - segN) % 6);
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getH1F("speADC_" + sector + "_" + order + "_" + paddle));
-                // this.getCanvas().draw(this.getDataGroup().getItem(sector,layer,paddle).getF1D("fADC_" + sector + "_" + layer + "_" + paddle),"same");
+                this.getCanvas().draw(this.getDataGroup().getItem(sector,order,paddle).getF1D("fADCe_" + sector + "_" + order + "_" + paddle),"same");
+		this.getCanvas().draw(this.getDataGroup().getItem(sector,order,paddle).getF1D("fADCp_" + sector + "_" + order + "_" + paddle),"same");
+		//this.getCanvas().draw(this.getDataGroup().getItem(sector,order,paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle),"same");
             }
 
         } else {
@@ -154,16 +165,17 @@ public class SPECalibration extends CalibrationModule {
 
     }
 
-    /*private void initADCgaussFitPar(F1D fADC, H1F speADC) {
-        
-        fADC.setRange(120, 270);
-        fADC.setParameter(0, 15);
+    private void initADCgaussFitPar(F1D fADCe, H1F speADC) {
+	
+	//for now the fit function is exponential only, will be changed after the successful definition of expo+poisson        
+        fADC.setRange(0, 2000);
+        fADC.setParameter(0, -0.0003);
         //fADC.setParLimits(0, -46, 46);
-        fADC.setParameter(1, 200);
+        fADC.setParameter(1, 1.6);
         //fADC.setParLimits(1, -600, 600);
-        fADC.setParameter(2, 20);
-        //fADC.setParLimits(2, 0, 200);
-    }*/
+        fADC.setParameter(1, 200);
+     
+    }
     @Override
     public Color getColor(DetectorShape2D dsd) {
         // show summary
