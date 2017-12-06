@@ -1,20 +1,20 @@
-package org.jlab.groot.demo;
+package modules;
 
 import org.jlab.groot.math.Func1D;
+import static org.apache.commons.math3.special.Gamma.gamma;
 
-public class CustomFunction extends Func1D{
+public class poissonf extends Func1D{
 
 	public poissonf(String name, double min, double max) {
 		super(name, min, max);
 	}
 	
-	//Simple polynomial function of any order
-	@Override
-	public double evaluate(double x){
-		double sum = 0.0;
-		for(int i=0; i<this.getNPars(); i++){
-			sum += this.getParameter(i)*Math.pow(x,i);
-		}
-		return sum;
+	
+	public double poissonff(double x, double par[]){
+	double arg = 0.0;
+        double arg2 = 0.0;
+            if (par[2] != 0) arg = x/par[2];
+            if (gamma(arg+1) != 0) arg2 = Math.pow(par[1], arg) /gamma(arg+1);
+       return par[0]*(arg2)*Math.exp(-par[1]);
 	}
 }
