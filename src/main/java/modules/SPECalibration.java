@@ -11,8 +11,6 @@ import java.util.List;
 import view.DetectorShape2D;
 import viewer.CalibrationModule;
 import viewer.CCDetector;
-import org.jlab.clas.pdg.PhysicsConstants;
-import org.jlab.clas.physics.Particle;
 import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.groot.base.ColorPalette;
 import org.jlab.groot.data.H1F;
@@ -20,10 +18,8 @@ import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 import org.jlab.groot.math.F1D;
-import org.jlab.groot.data.GraphErrors;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.utils.groups.IndexedList;
-import java.util.Scanner;
 
 /**
  *
@@ -47,26 +43,25 @@ public class SPECalibration extends CalibrationModule {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
                     // initialize calibration table
                     this.getCalibrationTable().addEntry(iSect, iOrde, iComp);
-                    
+
                     // initialize data group
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iOrde + "_" + iComp, 100, 100.0, 3000.0);
                     speADC.setTitleX("ADC");
                     speADC.setTitleY("counts");
                     speADC.setTitle("spe ADC Channel (" + iSect + "," + iOrde + "," + iComp + ")");
                     speADC.setFillColor(3);
-		    // Exponential fit function with 2 parameters
-                    F1D fADCe = new F1D("fADCe_" + iSect + "_" + iOrde + "_" + iComp, "exp(x,par[0],par[1])", 100, 3000);;
+                    // Exponential fit function with 2 parameters
+                    F1D fADCe = new F1D("fADCe_" + iSect + "_" + iOrde + "_" + iComp, "exp(x,par[0],par[1])", 100, 3000);
                     fADCe.setParameter(1, 100.0);
                     fADCe.setParameter(2, 0.1);
                     fADCe.setLineColor(2);
                     fADCe.setLineWidth(2);
-		    
-                    
-                    //saving the fit parameter in histogram bins
+
+                    // saving the fit parameter in histogram bins
                     H1F fitpar = new H1F("fitpar_" + iSect + "_" + iOrde + "_" + iComp, 5, 0.0, 5.0);
-                    //fit parameters from DB
+                    // fit parameters from DB
                     H1F fitparDB = new H1F("fitparDB_" + iSect + "_" + iOrde + "_" + iComp, 5, 0.0, 5.0);
-                   
+
                     DataGroup dg = new DataGroup(3, 2);
                     dg.addDataSet(speADC, (iComp - 1) % 6);
                     dg.addDataSet(fADCe, (iComp - 1) % 6); //added expo func to do
@@ -123,22 +118,24 @@ public class SPECalibration extends CalibrationModule {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
                     H1F speADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("speADC_" + iSect + "_" + iOrde + "_" + iComp);
                     // Poissonian fit function defined in poissonf.java with 3 parameters
-	   	    poissonf fADCp = new poissonf("fADCp_" + iSect + "_" + iOrde + "_" + iComp, 100, 2000);
-		    fADCp.setParameter(1, 1000.0);
-		    fADCp.setParameter(2, 4.0);
-		    fADCp.setParameter(3, 40.0);
+                    poissonf fADCp = new poissonf("fADCp_" + iSect + "_" + iOrde + "_" + iComp, 100, 2000);
+                    fADCp.setParameter(1, 1000.0);
+                    fADCp.setParameter(2, 4.0);
+                    fADCp.setParameter(3, 40.0);
                     fADCp.setLineColor(1);
                     fADCp.setLineWidth(2);
                     poissonExpo fADC = new poissonExpo("fADC_" + iSect + "_" + iOrde + "_" + iComp, 100, 3000);
                     fADC.setParameter(1, 1000.0);
-		    fADC.setParameter(2, 4.0);
-		    fADC.setParameter(3, 40.0);
-		    fADC.setParameter(4, 100.0);
-		    fADC.setParameter(5, 0.1);
+                    fADC.setParameter(2, 4.0);
+                    fADC.setParameter(3, 40.0);
+                    fADC.setParameter(4, 100.0);
+                    fADC.setParameter(5, 0.1);
                     fADC.setLineColor(1);
                     fADC.setLineWidth(2);
                     DataFitter.fit(fADC, speADC, "LQ");
-                    
+
+                    H1F fitpar = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("fitpar_" + iSect + "_" + iOrde + "_" + iComp);
+
                     fitpar.setBinContent(1, fADC.getParameter(1));
                     fitpar.setBinContent(2, fADC.getParameter(2));
                     fitpar.setBinContent(3, fADC.getParameter(3));
@@ -167,14 +164,16 @@ public class SPECalibration extends CalibrationModule {
             }
 
             int segN = paddle;
-            if(segN > 13) segN = 13;
+            if (segN > 13) {
+                segN = 13;
+            }
             for (paddle = segN; paddle < segN + 6; paddle++) {
                 this.getCanvas().divide(3, 2);
                 this.getCanvas().cd((paddle - segN) % 6);
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getH1F("speADC_" + sector + "_" + order + "_" + paddle));
-                this.getCanvas().draw(this.getDataGroup().getItem(sector,order,paddle).getF1D("fADCe_" + sector + "_" + order + "_" + paddle),"same");
-		this.getCanvas().draw(this.getDataGroup().getItem(sector,order,paddle).getF1D("fADCp_" + sector + "_" + order + "_" + paddle),"same");
-		this.getCanvas().draw(this.getDataGroup().getItem(sector,order,paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle),"same");
+                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCe_" + sector + "_" + order + "_" + paddle), "same");
+                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCp_" + sector + "_" + order + "_" + paddle), "same");
+                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle), "same");
             }
 
         } else {
@@ -182,7 +181,7 @@ public class SPECalibration extends CalibrationModule {
         }
 
     }
-    
+
     @Override
     public Color getColor(DetectorShape2D dsd) {
         // show summary
