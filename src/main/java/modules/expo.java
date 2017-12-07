@@ -12,6 +12,6 @@ public class expo extends Func1D{
 	
 	public double expof(double x, double par[]){
 	
-       return Math.exp(x*par[3]+par[4]);
+       return Math.exp(x*par[0]+par[1]);
 	}
 }
