@@ -50,13 +50,6 @@ public class SPECalibration extends CalibrationModule {
                     speADC.setTitleY("counts");
                     speADC.setTitle("spe ADC Channel (" + iSect + "," + iOrde + "," + iComp + ")");
                     speADC.setFillColor(3);
-                    // Exponential fit function with 2 parameters
-                    F1D fADCe = new F1D("fADCe_" + iSect + "_" + iOrde + "_" + iComp, "exp(x,par[0],par[1])", 100, 3000);
-                    fADCe.setParameter(1, 100.0);
-                    fADCe.setParameter(2, 0.1);
-                    fADCe.setLineColor(2);
-                    fADCe.setLineWidth(2);
-
                     // saving the fit parameter in histogram bins
                     H1F fitpar = new H1F("fitpar_" + iSect + "_" + iOrde + "_" + iComp, 5, 0.0, 5.0);
                     // fit parameters from DB
@@ -64,7 +57,6 @@ public class SPECalibration extends CalibrationModule {
 
                     DataGroup dg = new DataGroup(3, 2);
                     dg.addDataSet(speADC, (iComp - 1) % 6);
-                    dg.addDataSet(fADCe, (iComp - 1) % 6); //added expo func to do
                     dg.addDataSet(fitpar, (iComp - 1) % 6);//added fit parameters histo to the datagroup
                     dg.addDataSet(fitparDB, (iComp - 1) % 6);//added histo. of the fit parameters from DB to the datagroup
                     this.getDataGroup().add(dg, iSect, iOrde, iComp);
@@ -117,6 +109,11 @@ public class SPECalibration extends CalibrationModule {
             for (int iOrde = 0; iOrde < 1; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
                     H1F speADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("speADC_" + iSect + "_" + iOrde + "_" + iComp);
+                    expo fADCe = new expo("fADCe_" + iSect + "_" + iOrde + "_" + iComp, 100, 3000);
+                    fADCe.setParameter(1, 100.0);
+                    fADCe.setParameter(2, 0.1);
+                    fADCe.setLineColor(2);
+                    fADCe.setLineWidth(2);
                     // Poissonian fit function defined in poissonf.java with 3 parameters
                     poissonf fADCp = new poissonf("fADCp_" + iSect + "_" + iOrde + "_" + iComp, 100, 2000);
                     fADCp.setParameter(1, 1000.0);
