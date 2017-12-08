@@ -168,9 +168,30 @@ public class SPECalibration extends CalibrationModule {
                 this.getCanvas().divide(3, 2);
                 this.getCanvas().cd((paddle - segN) % 6);
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getH1F("speADC_" + sector + "_" + order + "_" + paddle));
+                H1F fitpar = this.getDataGroup().getItem(sector, order, paddle).getH1F("fitpar_" + sector + "_" + order + "_" + paddle);
+                poissonf fADCp = new poissonf("fADCp_" + sector + "_" + order + "_" + paddle, 100, 2000);
+                fADCp.setParameter(1, fitpar.getBinContent(1));
+                fADCp.setParameter(2, fitpar.getBinContent(2));
+                fADCp.setParameter(3, fitpar.getBinContent(3));
+                fADCp.setLineColor(1);
+                fADCp.setLineWidth(2);
+                expo fADCe = new expo("fADCe_" + sector + "_" + order + "_" + paddle, 100, 2000);
+                fADCe.setParameter(1, fitpar.getBinContent(1));
+                fADCe.setParameter(2, fitpar.getBinContent(2));
+                fADCe.setLineColor(2);
+                fADCe.setLineWidth(2);
+                poissonExpo fADC = new poissonExpo("fADC_" + sector + "_" + order + "_" + paddle, 100, 2000);
+                fADC.setParameter(1, fitpar.getBinContent(1));
+                fADC.setParameter(2, fitpar.getBinContent(2));
+                fADC.setParameter(3, fitpar.getBinContent(3));
+                fADC.setParameter(4, fitpar.getBinContent(4));
+                fADC.setParameter(5, fitpar.getBinContent(5));
+                fADC.setLineColor(3);
+                fADC.setLineWidth(2);
+                /*this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle));
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCe_" + sector + "_" + order + "_" + paddle), "same");
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCp_" + sector + "_" + order + "_" + paddle), "same");
-                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle), "same");
+                */
             }
 
         } else {
