@@ -14,7 +14,7 @@ public class poissonExpo extends Func1D {
         addParameter("f2");
     }
 
-    public double poissonff(double x, double par[]) {
+    public double poissonExpo(double x, double par[]) {
         
         double arg = 0.0;
 

@@ -91,7 +91,7 @@ public class SPECalibration extends CalibrationModule {
             int rows = bank.rows();
             for (int loop = 0; loop < rows; loop++) {
                 int sector = bank.getByte("sector", loop);
-                int order = bank.getByte("order", loop);
+                int order  = bank.getByte("order", loop);
                 int component = bank.getShort("component", loop);
                 int adc = bank.getInt("ADC", loop);
 
@@ -106,35 +106,38 @@ public class SPECalibration extends CalibrationModule {
         System.out.println("Analyzing");
 
         for (int iSect : this.getDetector().getSectors()) {
-            for (int iOrde = 0; iOrde < 1; iOrde++) {
+             // order indicate left (0) / right (1)
+           for (int iOrde = 0; iOrde < 2; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
 
                     H1F speADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("speADC_" + iSect + "_" + iOrde + "_" + iComp);
 
                    // poissonExpo fADC = new poissonExpo("fADC_" + iSect + "_" + iOrde + "_" + iComp, 10, 500);
-                    poissonf fADC = new poissonf("fADC_" + iSect + "_" + iOrde + "_" + iComp, 10, 500);
+                   // poissonf fADC = new poissonf("fADC_" + iSect + "_" + iOrde + "_" + iComp, 10, 500);
+                    expo fADC = new expo("expo",  10, 500);
 
 //                    fADC.setParameter(0, 100.0);
 //                    fADC.setParameter(1, 4.0);
 //                    fADC.setParameter(2, 0.2);
-//                    fADC.setParameter(3, 10.0);
+////                    fADC.setParameter(3, 10.0);
 //                    fADC.setParameter(4, 100);
-                    DataFitter.fit(fADC, speADC, "E");
+                    DataFitter.fit(fADC, speADC, "");
 
-                    if (iSect == 3 && iOrde == 2 && iComp == 6) {
+                    if (iSect == 3 && iOrde == 0 && iComp == 6) {
                         System.out.println("poissonExpoFit Parameter 0: " + fADC.getParameter(0));
                         System.out.println("poissonExpoFit Parameter 1: " + fADC.getParameter(1));
-                        System.out.println("poissonExpoFit Parameter 2: " + fADC.getParameter(2));
-                        System.out.println("poissonExpoFit Parameter 3: " + fADC.getParameter(3));
-                        System.out.println("poissonExpoFit Parameter 4: " + fADC.getParameter(4));
+//                        System.out.println("poissonExpoFit Parameter 2: " + fADC.getParameter(2));
+//                        System.out.println("poissonExpoFit Parameter 3: " + fADC.getParameter(3));
+//                        System.out.println("poissonExpoFit Parameter 4: " + fADC.getParameter(4));
                     }
+                    
                     H1F fitpar = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("fitpar_" + iSect + "_" + iOrde + "_" + iComp);
 
-                    fitpar.setBinContent(1, fADC.getParameter(0));
-                    fitpar.setBinContent(2, fADC.getParameter(1));
-                    fitpar.setBinContent(3, fADC.getParameter(2));
-                    fitpar.setBinContent(4, fADC.getParameter(3));
-                    fitpar.setBinContent(5, fADC.getParameter(4));
+//                    fitpar.setBinContent(1, fADC.getParameter(0));
+//                    fitpar.setBinContent(2, fADC.getParameter(1));
+//                    fitpar.setBinContent(3, fADC.getParameter(2));
+//                    fitpar.setBinContent(4, fADC.getParameter(3));
+//                    fitpar.setBinContent(5, fADC.getParameter(4));
                 }
             }
         }
@@ -162,6 +165,7 @@ public class SPECalibration extends CalibrationModule {
             if (segN > 13) {
                 segN = 13;
             }
+            
             for (paddle = segN; paddle < segN + 6; paddle++) {
                 this.getCanvas().divide(3, 2);
                 this.getCanvas().cd((paddle - segN) % 6);
