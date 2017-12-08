@@ -78,8 +78,8 @@ public class SPECalibration extends CalibrationModule {
             int maxComponent = 13;
             return this.getDataGroup().getItem(isec, order, maxComponent).getH1F("speADC_" + isec + "_" + order + "_" + maxComponent).getEntries();
         }
-
     }
+    
     public int nevents;
 
     @Override
@@ -103,41 +103,39 @@ public class SPECalibration extends CalibrationModule {
     }
 
     public void analyze() {
-//        System.out.println("Analyzing");
+        System.out.println("Analyzing");
 
         for (int iSect : this.getDetector().getSectors()) {
             for (int iOrde = 0; iOrde < 1; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
                     H1F speADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("speADC_" + iSect + "_" + iOrde + "_" + iComp);
-                    expo fADCe = new expo("fADCe_" + iSect + "_" + iOrde + "_" + iComp, 100, 3000);
-                    fADCe.setParameter(1, 100.0);
-                    fADCe.setParameter(2, 0.1);
-                    fADCe.setLineColor(2);
-                    fADCe.setLineWidth(2);
-                    // Poissonian fit function defined in poissonf.java with 3 parameters
-                    poissonf fADCp = new poissonf("fADCp_" + iSect + "_" + iOrde + "_" + iComp, 100, 2000);
-                    fADCp.setParameter(1, 1000.0);
-                    fADCp.setParameter(2, 4.0);
-                    fADCp.setParameter(3, 40.0);
-                    fADCp.setLineColor(1);
-                    fADCp.setLineWidth(2);
+                                        
                     poissonExpo fADC = new poissonExpo("fADC_" + iSect + "_" + iOrde + "_" + iComp, 100, 3000);
-                    fADC.setParameter(1, 1000.0);
-                    fADC.setParameter(2, 4.0);
-                    fADC.setParameter(3, 40.0);
-                    fADC.setParameter(4, 100.0);
-                    fADC.setParameter(5, 0.1);
+                    fADC.setParameter(0, 1000.0);
+                    fADC.setParameter(1, 4.0);
+                    fADC.setParameter(2, 40.0);
+                    fADC.setParameter(3, 100.0);
+                    fADC.setParameter(4, 0.1);
+                    
+                    
                     fADC.setLineColor(1);
                     fADC.setLineWidth(2);
+                    
                     DataFitter.fit(fADC, speADC, "LQ");
 
+                    System.out.println("poissonExpoFit Parameter 0: " + fADC.getParameter(0));
+                    System.out.println("poissonExpoFit Parameter 1: " + fADC.getParameter(1));
+                    System.out.println("poissonExpoFit Parameter 2: " + fADC.getParameter(2));
+                    System.out.println("poissonExpoFit Parameter 3: " + fADC.getParameter(3));
+                    System.out.println("poissonExpoFit Parameter 4: " + fADC.getParameter(4));
+                 
                     H1F fitpar = this.getDataGroup().getItem(iSect, iOrde, iComp).getH1F("fitpar_" + iSect + "_" + iOrde + "_" + iComp);
 
-                    fitpar.setBinContent(1, fADC.getParameter(1));
-                    fitpar.setBinContent(2, fADC.getParameter(2));
-                    fitpar.setBinContent(3, fADC.getParameter(3));
-                    fitpar.setBinContent(4, fADC.getParameter(4));
-                    fitpar.setBinContent(5, fADC.getParameter(5));
+                    fitpar.setBinContent(1, fADC.getParameter(0));
+                    fitpar.setBinContent(2, fADC.getParameter(1));
+                    fitpar.setBinContent(3, fADC.getParameter(2));
+                    fitpar.setBinContent(4, fADC.getParameter(3));
+                    fitpar.setBinContent(5, fADC.getParameter(4));
                 }
             }
         }
@@ -146,6 +144,7 @@ public class SPECalibration extends CalibrationModule {
 
     @Override
     public void processShape(DetectorShape2D dsd) {
+                
         //plot histos for the specific component
         int sector = dsd.getDescriptor().getSector();
         // layer is 1, 2 in the detector shape. It is 0, 1, in the histo (order
@@ -169,29 +168,38 @@ public class SPECalibration extends CalibrationModule {
                 this.getCanvas().cd((paddle - segN) % 6);
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getH1F("speADC_" + sector + "_" + order + "_" + paddle));
                 H1F fitpar = this.getDataGroup().getItem(sector, order, paddle).getH1F("fitpar_" + sector + "_" + order + "_" + paddle);
+                
+//                System.out.println("poissonExpo Fit Parameter 0: " + fitpar.getBinContent(0));
+//                System.out.println("poissonExpo Fit Parameter 1: " + fitpar.getBinContent(1));
+//                System.out.println("poissonExpo Fit Parameter 2: " + fitpar.getBinContent(2));
+//                System.out.println("poissonExpo Fit Parameter 3: " + fitpar.getBinContent(3));
+//                System.out.println("poissonExpo Fit Parameter 4: " + fitpar.getBinContent(4));
+
                 poissonf fADCp = new poissonf("fADCp_" + sector + "_" + order + "_" + paddle, 100, 2000);
-                fADCp.setParameter(1, fitpar.getBinContent(1));
-                fADCp.setParameter(2, fitpar.getBinContent(2));
-                fADCp.setParameter(3, fitpar.getBinContent(3));
-                fADCp.setLineColor(1);
+ //               fADCp.setParameter(0, fitpar.getBinContent(0));
+//                fADCp.setParameter(1, fitpar.getBinContent(1));
+//                fADCp.setParameter(2, fitpar.getBinContent(2));
+//                fADCp.setLineColor(1);
                 fADCp.setLineWidth(2);
-                expo fADCe = new expo("fADCe_" + sector + "_" + order + "_" + paddle, 100, 2000);
-                fADCe.setParameter(1, fitpar.getBinContent(1));
-                fADCe.setParameter(2, fitpar.getBinContent(2));
-                fADCe.setLineColor(2);
-                fADCe.setLineWidth(2);
-                poissonExpo fADC = new poissonExpo("fADC_" + sector + "_" + order + "_" + paddle, 100, 2000);
-                fADC.setParameter(1, fitpar.getBinContent(1));
-                fADC.setParameter(2, fitpar.getBinContent(2));
-                fADC.setParameter(3, fitpar.getBinContent(3));
-                fADC.setParameter(4, fitpar.getBinContent(4));
-                fADC.setParameter(5, fitpar.getBinContent(5));
-                fADC.setLineColor(3);
-                fADC.setLineWidth(2);
+//                expo fADCe = new expo("fADCe_" + sector + "_" + order + "_" + paddle, 100, 2000);
+//                fADCe.setParameter(1, fitpar.getBinContent(1));
+//                fADCe.setParameter(2, fitpar.getBinContent(2));
+//                fADCe.setLineColor(2);
+//                fADCe.setLineWidth(2);
+//                poissonExpo fADC = new poissonExpo("fADC_" + sector + "_" + order + "_" + paddle, 100, 2000);
+//                fADC.setParameter(1, fitpar.getBinContent(1));
+//                fADC.setParameter(2, fitpar.getBinContent(2));
+//                fADC.setParameter(3, fitpar.getBinContent(3));
+//                fADC.setParameter(4, fitpar.getBinContent(4));
+//                fADC.setParameter(5, fitpar.getBinContent(5));
+//                fADC.setLineColor(3);
+//                fADC.setLineWidfADCpth(2);
                 /*this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle));
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCe_" + sector + "_" + order + "_" + paddle), "same");
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCp_" + sector + "_" + order + "_" + paddle), "same");
-                */
+                 */
+
+ //               this.getCanvas().draw(fADCp);
             }
 
         } else {
@@ -220,6 +228,6 @@ public class SPECalibration extends CalibrationModule {
 
     @Override
     public void timerUpdate() {
-        this.analyze();
+        analyze();
     }
 }

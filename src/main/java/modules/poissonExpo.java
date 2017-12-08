@@ -7,6 +7,11 @@ public class poissonExpo extends Func1D{
 
 	public poissonExpo(String name, double min, double max) {
 		super(name, min, max);
+        addParameter("amp");
+        addParameter("mean");
+        addParameter("sigma");
+        addParameter("f1");
+        addParameter("f2");
 	}
 	
 	
