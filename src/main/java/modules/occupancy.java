@@ -63,10 +63,10 @@ public class occupancy extends CalibrationModule {
         return Arrays.asList(getCalibrationTable());
     }
 
-    public int getNEvents(int isec, int order, int icomp) {
+    /*public int getNEvents(int isec, int order, int icomp) {
        
             return this.getDataGroup().getItem(isec, order, icomp).getH2F("chanADC_"+ isec + "_" + order + "_" + icomp).getEntries();    
-    }
+    }*/
 
     public int nevents;
 
@@ -82,9 +82,9 @@ public class occupancy extends CalibrationModule {
                 int order  = bank.getByte("order", loop);
                 int component = bank.getShort("component", loop);
                 int adc = bank.getInt("ADC", loop);
-
-                
-                        for (order = 0; order < 2; order++) {
+                    
+                    for(sector : this.getDetector().getSectors()){
+                        for(order = 0; order < 2; order++){    
                             for (component = 1; component <= this.getSegments(); component++) {
                                 if (sector > 0 && adc > 0) {
                                 this.getDataGroup().getItem(sector, order, component).getH2F("chanADC_" + sector + "_" + order + "_" + component).fill(adc, component);
@@ -94,6 +94,7 @@ public class occupancy extends CalibrationModule {
                 }
              }
         }
+    }
     
 
     public void analyze() {
@@ -101,10 +102,10 @@ public class occupancy extends CalibrationModule {
 
         for (int iSect : this.getDetector().getSectors()) {
              // order indicate left (0) / right (1)
-           for (int iOrde = 0; iOrde < 2; iOrde++) {
+          for (int iOrde = 0; iOrde < 2; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
 
-                    H2F chanADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH2F("chanADC_" + iSect + "_" + iOrde + "_" + iComp);
+                    H2F chanADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH2F("chanADC_"+ iSect + "_" + iOrde + "_" + iComp);
         }
            }
         }
@@ -140,7 +141,7 @@ public class occupancy extends CalibrationModule {
 
     }
 
-    @Override
+    /*@Override
     public Color getColor(DetectorShape2D dsd) {
         // show summary
         int sector = dsd.getDescriptor().getSector();
@@ -156,7 +157,7 @@ public class occupancy extends CalibrationModule {
 
 //        col = new Color(100, 0, 0);
         return col;
-    }
+    }*/
 
     @Override
     public void timerUpdate() {
