@@ -41,14 +41,19 @@ public class occupancy extends CalibrationModule {
             // order indicate left (0) / right (1)
             for (int iOrde = 0; iOrde < 2; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
+
                     // initialize calibration table
                     this.getCalibrationTable().addEntry(iSect, iOrde, iComp);
 
+                    // 19 is right side
+                    // in the past it was 1 = 1 left, 2 = 1 right, etc
+                    int pmtIndex = (iOrde * 18) + iComp;
+
                     // initialize data group
-                    H2F chanADC = new H2F("chanADC_" + iSect + "_" + iOrde + "_" + iComp, 100, 100.0, 3000.0, 1, 1, 36);
+                    H2F chanADC = new H2F("chanADC_" + iSect + "_" + pmtIndex, 100, 100.0, 3000.0, 1, 1, 36);
                     chanADC.setTitleX("ADC" + " " + "Sector" + "_" + iSect);
                     chanADC.setTitleY("channel");
-                  
+
                     DataGroup dg = new DataGroup(3, 2);
                     dg.addDataSet(chanADC, (iSect - 1) % 6);
                     this.getDataGroup().add(dg, iSect, iOrde, iComp);
@@ -67,7 +72,6 @@ public class occupancy extends CalibrationModule {
        
             return this.getDataGroup().getItem(isec, order, icomp).getH2F("chanADC_"+ isec + "_" + order + "_" + icomp).getEntries();    
     }*/
-
     public int nevents;
 
     @Override
@@ -78,40 +82,38 @@ public class occupancy extends CalibrationModule {
             DataBank bank = event.getBank("LTCC::adc");
             int rows = bank.rows();
             for (int loop = 0; loop < rows; loop++) {
-                int sector = bank.getByte("sector", loop);
-                int order  = bank.getByte("order", loop);
-                int component = bank.getShort("component", loop);
                 int adc = bank.getInt("ADC", loop);
-                    
-                    for(sector : this.getDetector().getSectors()){
-                        for(order = 0; order < 2; order++){    
-                            for (component = 1; component <= this.getSegments(); component++) {
-                                if (sector > 0 && adc > 0) {
-                                this.getDataGroup().getItem(sector, order, component).getH2F("chanADC_" + sector + "_" + order + "_" + component).fill(adc, component);
-                            }     
+
+                for (int iSect : this.getDetector().getSectors()) {
+                    for (int iOrder = 0; iOrder < 2; iOrder++) {
+                        for (int iComponent = 1; iComponent <= this.getSegments(); iComponent++) {
+                            int pmtIndex = (iOrder * 18) + iComponent;
+
+                            if (iSect > 0 && adc > 0) {
+                                this.getDataGroup().getItem(iSect, iOrder, iComponent).getH2F("chanADC_" + iSect + "_" + pmtIndex).fill(adc, pmtIndex);
+                            }
                         }
                     }
                 }
-             }
+            }
         }
     }
-    
 
     public void analyze() {
         System.out.println("Analyzing");
 
         for (int iSect : this.getDetector().getSectors()) {
-             // order indicate left (0) / right (1)
-          for (int iOrde = 0; iOrde < 2; iOrde++) {
+            // order indicate left (0) / right (1)
+            for (int iOrde = 0; iOrde < 2; iOrde++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
+                    int pmtIndex = (iOrde * 18) + iComp;
 
-                    H2F chanADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH2F("chanADC_"+ iSect + "_" + iOrde + "_" + iComp);
-        }
-           }
+                    H2F chanADC = this.getDataGroup().getItem(iSect, iOrde, iComp).getH2F("chanADC_" + iSect + "_" + pmtIndex);
+                }
+            }
         }
         getCalibrationTable().fireTableDataChanged();
     }
-        
 
     @Override
     public void processShape(DetectorShape2D dsd) {
@@ -129,10 +131,10 @@ public class occupancy extends CalibrationModule {
             if (sector % 6 == 0) {
                 this.getCanvas().clear();
             }
-            
+
             for (sector = 1; sector <= 6; sector++) {
                 this.getCanvas().divide(3, 2);
-                this.getCanvas().cd((sector-1) % 6);
+                this.getCanvas().cd((sector - 1) % 6);
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getH2F("chanADC_" + sector + "_" + order + "_" + paddle));
             }
         } else {
@@ -158,7 +160,6 @@ public class occupancy extends CalibrationModule {
 //        col = new Color(100, 0, 0);
         return col;
     }*/
-
     @Override
     public void timerUpdate() {
         analyze();
