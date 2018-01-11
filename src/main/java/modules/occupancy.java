@@ -68,10 +68,10 @@ public class occupancy extends CalibrationModule {
         return Arrays.asList(getCalibrationTable());
     }
 
-    /*public int getNEvents(int isec, int order, int icomp) {
+    public int getNEvents(int isec, int order, int icomp) {
        
             return this.getDataGroup().getItem(isec, order, icomp).getH2F("chanADC_"+ isec + "_" + order + "_" + icomp).getEntries();    
-    }*/
+    }
     public int nevents;
 
     @Override
