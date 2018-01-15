@@ -69,8 +69,8 @@ public class occupancy extends CalibrationModule {
     }
 
     public int getNEvents(int isec, int order, int icomp) {
-       
-            return this.getDataGroup().getItem(isec, order, icomp).getH2F("chanADC_"+ isec + "_" + order + "_" + icomp).getEntries();    
+            int pmtIndex = (order * 18) + icomp;
+            return this.getDataGroup().getItem(isec, order, icomp).getH2F("chanADC_"+ isec + "_" + pmtIndex).getEntries();    
     }
     public int nevents;
 
@@ -82,23 +82,26 @@ public class occupancy extends CalibrationModule {
             DataBank bank = event.getBank("LTCC::adc");
             int rows = bank.rows();
             for (int loop = 0; loop < rows; loop++) {
+                int sector = bank.getByte("sector", loop);
+                int order  = bank.getByte("order", loop);
+                int component = bank.getShort("component", loop);
                 int adc = bank.getInt("ADC", loop);
-
-                for (int iSect : this.getDetector().getSectors()) {
-                    for (int iOrder = 0; iOrder < 2; iOrder++) {
-                        for (int iComponent = 1; iComponent <= this.getSegments(); iComponent++) {
-                            int pmtIndex = (iOrder * 18) + iComponent;
-
-                            if (iSect > 0 && adc > 0) {
-                                this.getDataGroup().getItem(iSect, iOrder, iComponent).getH2F("chanADC_" + iSect + "_" + pmtIndex).fill(adc, pmtIndex);
+                
+                    for(int iSect : this.getDetector().getSectors()){
+                        for(order = 0; order < 2; order++){
+                            for(component = 1; component <= this.getSegments(); component++){
+                               if (sector > 0 && adc > 0) {
+                                    int pmtIndex = (order * 18) + component;
+                                           
+                                    this.getDataGroup().getItem(sector, order, component).getH2F("chanADC_" + sector + "_" + pmtIndex).fill(adc, pmtIndex);
                             }
                         }
                     }
                 }
             }
         }
-    }
-
+    }   
+    
     public void analyze() {
         System.out.println("Analyzing");
 
@@ -124,7 +127,8 @@ public class occupancy extends CalibrationModule {
         int layer = dsd.getDescriptor().getLayer();
         int order = layer - 1;
         int paddle = dsd.getDescriptor().getComponent();
-        System.out.println("Selected shape " + sector + " " + layer + " " + paddle);
+        int pmtIndex = (order * 18) + paddle;
+        System.out.println("Selected shape " + sector + " " + pmtIndex);
         IndexedList<DataGroup> group = this.getDataGroup();
 
         if (group.hasItem(sector, order, paddle) == true) {
@@ -132,18 +136,18 @@ public class occupancy extends CalibrationModule {
                 this.getCanvas().clear();
             }
 
-            for (sector = 1; sector <= 6; sector++) {
+            for (int sect : this.getDetector().getSectors()) {
                 this.getCanvas().divide(3, 2);
-                this.getCanvas().cd((sector - 1) % 6);
-                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getH2F("chanADC_" + sector + "_" + order + "_" + paddle));
+                this.getCanvas().cd((sect - 1) % 6);
+                this.getCanvas().draw(this.getDataGroup().getItem(sect, order, paddle).getH2F("chanADC_" + sect + "_" + pmtIndex));
             }
-        } else {
+        }else {
             System.out.println(" ERROR: can not find the data group");
         }
 
     }
 
-    /*@Override
+    @Override
     public Color getColor(DetectorShape2D dsd) {
         // show summary
         int sector = dsd.getDescriptor().getSector();
@@ -159,7 +163,7 @@ public class occupancy extends CalibrationModule {
 
 //        col = new Color(100, 0, 0);
         return col;
-    }*/
+    }
     @Override
     public void timerUpdate() {
         analyze();
