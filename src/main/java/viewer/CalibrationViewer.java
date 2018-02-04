@@ -267,7 +267,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     private int getRunNumber(DataEvent event) {
         int rNum = this.runNumber;
-        DataBank bank = event.getBank("RUN::config");
+        DataBank bank = null;
+        if(event.hasBank("RUN::config")) event.getBank("RUN::config");
         if (bank != null) {
             rNum = bank.getInt("run", 0);
         }
