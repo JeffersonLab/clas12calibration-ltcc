@@ -12,7 +12,7 @@ public class poissonf extends Func1D {
 
         addParameter(new UserParameter("amp",     0, 100, 300000 ));
         addParameter(new UserParameter("mean",  200,  50,    600 ));
-        addParameter(new UserParameter("sigma",  10,  20,    400 ));
+        addParameter(new UserParameter("sigma",  20,  10,    400 ));
     }
 
     public double evaluate(double x) {

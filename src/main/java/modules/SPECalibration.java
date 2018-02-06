@@ -27,7 +27,7 @@ import org.jlab.utils.groups.IndexedList;
 public class SPECalibration extends CalibrationModule {
 
     public SPECalibration(CCDetector d, String name) {
-        super(d, name, "offset:offset_error:resolution");
+        super(d, name, "mean:mean_e:sigma:sigma_e");
     }
 
     // event processed
@@ -45,24 +45,35 @@ public class SPECalibration extends CalibrationModule {
 
                     // initialize calibration table
                     this.getCalibrationTable().addEntry(iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(200.0, "mean", iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(10.0, "mean_e", iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(20.0, "sigma", iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(2.0, "sigma_e", iSect, iSide, iComp);
 
                     // initialize data group
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iSide + "_" + iComp, 200, 0.0, 1000.0);
                     speADC.setTitleX("ADC");
                     speADC.setTitleY("Counts");
                     String sideString = "Left";
-                    if(iSide == 1) sideString = "Right";
+                    if (iSide == 1) {
+                        sideString = "Right";
+                    }
                     speADC.setTitle("S" + iSect + " Paddle: " + iComp + " " + sideString);
-                    speADC.setFillColor(3);
 
                     // histos to save/retrieve the fit parameters
-                    H1F fitpar = new H1F("fitpar_" + iSect + "_" + iSide + "_" + iComp, 5, 0.0, 5.0);
-                    H1F fitparDB = new H1F("fitparDB_" + iSect + "_" + iSide + "_" + iComp, 5, 0.0, 5.0);
+                    H1F fitpars = new H1F("fitpars_" + iSect + "_" + iSide + "_" + iComp, 5, 0.0, 5.0);
+                    H1F fitparsDB = new H1F("fitparsDB_" + iSect + "_" + iSide + "_" + iComp, 5, 0.0, 5.0);
+
+                    // gaussian fit function
+                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma])", 50, 600);
+                    gaussianFit.setLineColor(3);
+                    gaussianFit.setLineWidth(2);
 
                     DataGroup dg = new DataGroup(6, 3);
                     dg.addDataSet(speADC, 0);
-                    dg.addDataSet(fitpar, 0);   // added fit parameters histo to the datagroup
-                    dg.addDataSet(fitparDB, 0);   // added hist containing fit parameters from DB to the datagroup
+                    dg.addDataSet(fitpars, 0);   // added fit parameters histo to the datagroup
+                    dg.addDataSet(fitparsDB, 0);   // added hist containing fit parameters from DB to the datagroup
+                    dg.addDataSet(gaussianFit, 0);   // added gaussian fit function
 
                     this.getDataGroup().add(dg, iSect, iSide, iComp);
                 }
@@ -129,30 +140,28 @@ public class SPECalibration extends CalibrationModule {
 
                     H1F speADC = this.getHistogramFromDataDataGroup("speADC_", iSect, iSide, iComp);
 
+                    F1D gaussianFit = this.getDataGroup().getItem(iSect, iSide, iComp).getF1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp);
+                    this.initTimeGaussFitPar(gaussianFit, speADC);
+
+                    DataFitter.fit(gaussianFit, speADC, "LQ");
+
+                    updateCalibration(iSect, iSide, iComp);
+
 //                    poissonExpo poissonExpoFitF = new poissonExpo("fADC_" + iSect + "_" + iSide + "_" + iComp, 10, 500);
 //                    initPoissonExpoPars(poissonExpoFitF, speADC);
 // 
-                    poissonf poissonfFitF = new poissonf("fADC_" + iSect + "_" + iSide + "_" + iComp, 10, 600);
-                    initPoissonfFitPars(poissonfFitF, speADC);
-                    DataFitter.fit(poissonfFitF, speADC, "");
-
-
-
-
-                    if (iSect == 3 && iSide == 0 && iComp == 6) {
-                        //                      System.out.println("poissonExpoFit Parameter 0: " + fADC.getParameter(0));
-                        //                      System.out.println("poissonExpoFit Parameter 1: " + fADC.getParameter(1));
-//                        System.out.println("poissonExpoFit Parameter 2: " + fADC.getParameter(2));
-//                        System.out.println("poissonExpoFit Parameter 3: " + fADC.getParameter(3));
-//                        System.out.println("poissonExpoFit Parameter 4: " + fADC.getParameter(4));
-                    }
-
-                    //                  H1F fitpar = this.getDataGroup().getItem(iSect, iSide, iComp).getH1F("fitpar_" + iSect + "_" + iSide + "_" + iComp);
-//                    fitpar.setBinContent(1, fADC.getParameter(0));
-//                    fitpar.setBinContent(2, fADC.getParameter(1));
-//                    fitpar.setBinContent(3, fADC.getParameter(2));
-//                    fitpar.setBinContent(4, fADC.getParameter(3));
-//                    fitpar.setBinContent(5, fADC.getParameter(4));
+//                    poissonf poissonfFitF = new poissonf("poissonfFitF_" + iSect + "_" + iSide + "_" + iComp, 10, 600);
+//                    initPoissonfFitPars(poissonfFitF, speADC);
+//                    DataFitter.fit(poissonfFitF, speADC, "");
+                    // saving pars to histo
+//                    H1F fitParHisto = this.getHistogramFromDataDataGroup("fitpars_", iSect, iSide, iComp);
+//                    fitParHisto.setBinContent(1, poissonfFitF.getParameter(0));
+//                    fitParHisto.setBinContent(2, poissonfFitF.getParameter(1));
+//                    fitParHisto.setBinContent(3, poissonfFitF.getParameter(2));
+//
+//                    System.out.println("poissonExpo Fit Parameter 0: " + poissonfFitF.getParameter(0));
+//                    System.out.println("poissonExpo Fit Parameter 1: " + poissonfFitF.getParameter(1));
+//                    System.out.println("poissonExpo Fit Parameter 2: " + poissonfFitF.getParameter(2));
                 }
             }
         }
@@ -172,73 +181,45 @@ public class SPECalibration extends CalibrationModule {
         // System.out.println("Selected shape " + sector + " " + layer + " " + paddle);
         for (int paddle = 1; paddle < 19; paddle++) {
             if (this.getDataGroup().hasItem(sector, side, paddle) == true) {
-                this.getCanvas().cd(paddle-1);
+                this.getCanvas().cd(paddle - 1);
                 H1F speADC = this.getHistogramFromDataDataGroup("speADC_", sector, side, paddle);
                 this.getCanvas().draw(speADC);
+
+                // not working yet
+//                H1F fitParHisto = this.getHistogramFromDataDataGroup("fitpars_", sector, side, paddle);
+//                System.out.println(" Fit Parameter 0: " + fitParHisto.getBinContent(0));
+//                System.out.println(" Fit Parameter 1: " + fitParHisto.getBinContent(1));
+//                System.out.println(" Fit Parameter 2: " + fitParHisto.getBinContent(2));
+//
+//                poissonf poissonfFitF = new poissonf("poissonfFitF_" + sector + "_" + side + "_" + paddle, 10, 600);
+//                poissonfFitF.setParameter(0, fitParHisto.getBinContent(0));
+//                poissonfFitF.setParameter(1, fitParHisto.getBinContent(1));
+//                poissonfFitF.setParameter(2, fitParHisto.getBinContent(2));
+//                this.getCanvas().draw(poissonfFitF, "same");
             } else {
                 System.out.println(" ERROR: can not find the data group for sector " + sector);
             }
 
         }
 
-//            for (paddle = segN; paddle < segN + 6; paddle++) {
-//                this.getCanvas().divide(3, 2);
-//                this.getCanvas().cd((paddle - segN) % 6);
-//                this.getCanvas().draw(this.getDataGroup().getItem(sector, side, paddle).getH1F("speADC_" + sector + "_" + side + "_" + paddle));
-//                H1F fitpar = this.getDataGroup().getItem(sector, side, paddle).getH1F("fitpar_" + sector + "_" + side + "_" + paddle);
-//
-////                System.out.println("poissonExpo Fit Parameter 0: " + fitpar.getBinContent(0));
-////                System.out.println("poissonExpo Fit Parameter 1: " + fitpar.getBinContent(1));
-////                System.out.println("poissonExpo Fit Parameter 2: " + fitpar.getBinContent(2));
-////                System.out.println("poissonExpo Fit Parameter 3: " + fitpar.getBinContent(3));
-////                System.out.println("poissonExpo Fit Parameter 4: " + fitpar.getBinContent(4));
-//                poissonf fADCp = new poissonf("fADCp_" + sector + "_" + side + "_" + paddle, 100, 2000);
-//                //               fADCp.setParameter(0, fitpar.getBinContent(0));
-////                fADCp.setParameter(1, fitpar.getBinContent(1));
-////                fADCp.setParameter(2, fitpar.getBinContent(2));
-////                fADCp.setLineColor(1);
-//                fADCp.setLineWidth(2);
-////                expo fADCe = new expo("fADCe_" + sector + "_" + order + "_" + paddle, 100, 2000);
-////                fADCe.setParameter(1, fitpar.getBinContent(1));
-////                fADCe.setParameter(2, fitpar.getBinContent(2));
-////                fADCe.setLineColor(2);
-////                fADCe.setLineWidth(2);
-////                poissonExpo fADC = new poissonExpo("fADC_" + sector + "_" + order + "_" + paddle, 100, 2000);
-////                fADC.setParameter(1, fitpar.getBinContent(1));
-////                fADC.setParameter(2, fitpar.getBinContent(2));
-////                fADC.setParameter(3, fitpar.getBinContent(3));
-////                fADC.setParameter(4, fitpar.getBinContent(4));
-////                fADC.setParameter(5, fitpar.getBinContent(5));
-////                fADC.setLineColor(3);
-////                fADC.setLineWidfADCpth(2);
-//                /*this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADC_" + sector + "_" + order + "_" + paddle));
-//                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCe_" + sector + "_" + order + "_" + paddle), "same");
-//                this.getCanvas().draw(this.getDataGroup().getItem(sector, order, paddle).getF1D("fADCp_" + sector + "_" + order + "_" + paddle), "same");
-//                 */
-//
-//                //               this.getCanvas().draw(fADCp);
-//            }
-    
+    }
 
-}
+    @Override
+    public Color getColor(DetectorShape2D dsd) {
 
-@Override
-        public Color getColor(DetectorShape2D dsd) {
-        
         int sector = dsd.getDescriptor().getSector();
-        int layer  = dsd.getDescriptor().getLayer();
-        int order  = layer - 1;
-        
-        
+        int layer = dsd.getDescriptor().getLayer();
+        int order = layer - 1;
+
         int key = dsd.getDescriptor().getComponent();
-        
+
         ColorPalette palette = new ColorPalette();
-        
+
         Color col = new Color(100, 100, 100);
-        
+
         // retrieve number of entries from speADC
         int nent = this.getNumberOfEntries(sector, order, key);
-        
+
         if (nent > 0) {
             col = palette.getColor3D(nent, this.getnProcessed(), true);
         }
@@ -247,34 +228,11 @@ public class SPECalibration extends CalibrationModule {
     }
 
     @Override
-        public void timerUpdate() {
+    public void timerUpdate() {
         analyze();
     }
-        
+
     private void initPoissonExpoPars(poissonExpo function, H1F histo) {
-        
-        double hAmp  = histo.getBinContent(histo.getMaximumBin());
-        double hMean = histo.getAxis().getBinCenter(histo.getMaximumBin());
-        
-        double hRMS = histo.getRMS();
-        
-        double rangeMin = (hMean - (0.8 * hRMS));
-        double rangeMax = (hMean + (0.2 * hRMS));
-        function.setRange(rangeMin, rangeMax);
-        
-        double pm = (hMean * 3.) / 100.0;
-        
-        function.setParameter(0, hAmp);
-        function.setParLimits(0, hAmp * 0.8, hAmp * 1.2);
-        
-        function.setParameter(1, hMean);
-        function.setParLimits(1, hMean - pm, hMean + (pm));
-        
-        function.setParameter(2, 0.05);
-        function.setParLimits(2, 0.001 * hRMS, 0.8 * hRMS);
-    }
-       
-    private void initPoissonfFitPars(poissonf function, H1F histo) {
 
         double hAmp = histo.getBinContent(histo.getMaximumBin());
         double hMean = histo.getAxis().getBinCenter(histo.getMaximumBin());
@@ -285,27 +243,96 @@ public class SPECalibration extends CalibrationModule {
         double rangeMax = (hMean + (0.2 * hRMS));
         function.setRange(rangeMin, rangeMax);
 
-        double par0Min = hAmp * 0.8;
-        double par0Max = hAmp * 1.2;
+        double pm = (hMean * 3.) / 100.0;
+
+        function.setParameter(0, hAmp);
+        function.setParLimits(0, hAmp * 0.8, hAmp * 1.2);
+
+        function.setParameter(1, hMean);
+        function.setParLimits(1, hMean - pm, hMean + (pm));
+
+        function.setParameter(2, 0.05);
+        function.setParLimits(2, 0.001 * hRMS, 0.8 * hRMS);
+    }
+
+    private void initPoissonfFitPars(poissonf function, H1F histo) {
+
+        double hAmp = histo.getBinContent(histo.getMaximumBin());
+        double hMean = histo.getAxis().getBinCenter(histo.getMaximumBin());
+
+        double hRMS = histo.getRMS();
+
+        double rangeMin = (hMean - (0.8 * hRMS));
+        double rangeMax = (hMean + (0.2 * hRMS));
+        // function.setRange(rangeMin, rangeMax);
+
+        double par0Min = hAmp * 0.5;
+        double par0Max = hAmp * 2.0;
 
         function.setParameter(0, hAmp);
         function.setParLimits(0, par0Min, par0Max);
 
-        double pm = (hMean * 3.) / 100.0;
+        double pm = (hMean * 0.5);
         double par1Min = hMean - pm;
         double par1Max = hMean + pm;
         function.setParameter(1, hMean);
         function.setParLimits(1, par1Min, par1Max);
 
         double par2Min = 0.01 * hRMS;
-        double par2Max = 0.5  * hRMS;
+        double par2Max = 2 * hRMS;
         function.setParameter(2, 20);
         function.setParLimits(2, par2Min, par2Max);
 
         System.out.println("poissonf parameter 0 " + function.getParameter(0) + " min: " + par0Min + " max: " + par0Max);
         System.out.println("poissonf parameter 1 " + function.getParameter(1) + " min: " + par1Min + " max: " + par1Max);
-        System.out.println("poissonf parameter 2 " + function.getParameter(2) + " min: " + par0Min + " max: " + par0Max);
+        System.out.println("poissonf parameter 2 " + function.getParameter(2) + " min: " + par2Min + " max: " + par2Max);
 
     }
-    
+
+    private void initTimeGaussFitPar(F1D function, H1F histo) {
+        double hAmp = histo.getBinContent(histo.getMaximumBin());
+        double hMean = histo.getAxis().getBinCenter(histo.getMaximumBin());
+
+        double hRMS = histo.getRMS();
+
+        double rangeMin = (hMean - (0.8 * hRMS));
+        double rangeMax = (hMean + (2.0 * hRMS));
+        //  function.setRange(rangeMin, rangeMax);
+
+        double par0Min = hAmp * 0.5;
+        double par0Max = hAmp * 2.0;
+        function.setParameter(0, hAmp);
+        function.setParLimits(0, par0Min, par0Max);
+
+        double pm = (hMean * 0.8);
+        double par1Min = hMean - pm;
+        double par1Max = hMean + pm;
+        function.setParameter(1, hMean);
+        function.setParLimits(1, par1Min, par1Max);
+
+        double par2Min = 0.1 * hRMS;
+        double par2Max = 4 * hRMS;
+        function.setParameter(2, 20);
+        function.setParLimits(2, par2Min, par2Max);
+
+//        System.out.println("gauss parameter 0 " + function.getParameter(0) + " min: " + par0Min + " max: " + par0Max);
+//        System.out.println("gauss parameter 1 " + function.getParameter(1) + " min: " + par1Min + " max: " + par1Max);
+//        System.out.println("gauss parameter 2 " + function.getParameter(2) + " min: " + par2Min + " max: " + par2Max);
+    }
+
+    private void updateCalibration(int sector, int side, int paddle) {
+
+        F1D gaussianFit = this.getDataGroup().getItem(sector, side, paddle).getF1D("gaussianFit" + sector + "_" + side + "_" + paddle);
+
+        double mean = gaussianFit.parameter(1).value();
+        double mean_e = gaussianFit.parameter(1).error();
+        double sigma = gaussianFit.parameter(2).value();
+        double sigma_e = gaussianFit.parameter(2).error();
+
+        getCalibrationTable().setDoubleValue(mean, "mean", sector, side, paddle);
+        getCalibrationTable().setDoubleValue(mean_e, "mean_e", sector, side, paddle);
+        getCalibrationTable().setDoubleValue(sigma, "sigma", sector, side, paddle);
+        getCalibrationTable().setDoubleValue(sigma_e, "sigma_e", sector, side, paddle);
+
+    }
 }

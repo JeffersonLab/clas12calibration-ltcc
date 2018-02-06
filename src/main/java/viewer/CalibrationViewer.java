@@ -253,7 +253,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 null,
                 "1000");
         if (s != null) {
-            int time = 1000;
+            int time = 2000;
             try {
                 time = Integer.parseInt(s);
             } catch (NumberFormatException e) {
