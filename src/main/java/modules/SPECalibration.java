@@ -21,6 +21,10 @@ import org.jlab.groot.math.F1D;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.utils.groups.IndexedList;
 
+
+// for mode help on groot:
+// https://github.com/gavalian/groot
+
 /**
  * @author burcu
  */
@@ -65,7 +69,8 @@ public class SPECalibration extends CalibrationModule {
                     H1F fitparsDB = new H1F("fitparsDB_" + iSect + "_" + iSide + "_" + iComp, 5, 0.0, 5.0);
 
                     // gaussian fit function
-                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma])", 50, 600);
+                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma])", 50, 800);
+//                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma]) + [e0]*exp(-x*[e1])", 50, 600);
                     gaussianFit.setLineColor(3);
                     gaussianFit.setLineWidth(2);
 
