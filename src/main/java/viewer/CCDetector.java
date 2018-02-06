@@ -26,7 +26,7 @@ public class CCDetector extends DetectorPane2D {
     public CCDetector(String name) {
         this.viewName = name;
         this.ccPix = new CCPixels();   
-        this.init(1,6);
+        this.init(1, 6);
     } 
     
     public void init(int is1, int is2) {
@@ -34,9 +34,7 @@ public class CCDetector extends DetectorPane2D {
    }
     
     public void initButtons() {
-        
-        System.out.println("CCDetector.initButtons()");
-        
+        System.out.println("CCDetector.initButtons()");     
 //        initMapButtons(0, 0);
 //        initMapButtons(1, 0);
 //        initViewButtons(0, 0); 
@@ -49,8 +47,8 @@ public class CCDetector extends DetectorPane2D {
         
         for(int is=is1; is<=is2; is++) {
             sectors.add(is);
-            for(int ip=0; ip<ccPix.cc_nstr[0] ; ip++) this.getView().addShape("L0",getMirror(is,1,ip));
-            for(int ip=0; ip<ccPix.cc_nstr[1] ; ip++) this.getView().addShape("R0",getMirror(is,2,ip));
+            for(int ip=0; ip<ccPix.cc_nstr[0] ; ip++) this.getView().addShape("L0", getMirror(is,1,ip));
+            for(int ip=0; ip<ccPix.cc_nstr[1] ; ip++) this.getView().addShape("R0", getMirror(is,2,ip));
         }   
                 
         for(String layer : this.getView().getLayerNames()){

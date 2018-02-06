@@ -24,7 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import modules.TimeCalibration;
 import modules.SPECalibration;
-import modules.occupancy;
+import modules.Occupancy;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
@@ -125,10 +125,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         initDetector();
         detectorPanel.add(detectorView);
 
-        // create module viewer
-        modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
+        // create module viewer: each of these is on one tab
+        //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
         modules.add(new SPECalibration(detectorView, "SPECalibration"));
-        modules.add(new occupancy(detectorView, "occupancy"));
+        //modules.add(new Occupancy(detectorView, "Occupancy"));
+      
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
             modulePanel.add(modules.get(k).getName(), modules.get(k).getView());
@@ -176,10 +177,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.loadHistosFromFile(fileName);
             }
         }
-        if (e.getActionCommand() == "Print histograms to file...") {
+        if ("Print histograms to file...".equals(e.getActionCommand())) {
             this.printHistosToFile();
         }
-        if (e.getActionCommand() == "Save histograms...") {
+        
+        if ("Save histograms...".equals(e.getActionCommand())) {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String fileName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date()) + ".hipo";
             JFileChooser fc = new JFileChooser();
@@ -193,7 +195,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
             this.saveHistosToFile(fileName);
         }
-        if (e.getActionCommand() == "Load...") {
+        if ("Load...".equals(e.getActionCommand())) {
             String filePath = null;
             JFileChooser fc = new JFileChooser();
             fc.setDialogTitle("Choose Constants Folder...");
@@ -209,7 +211,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.modules.get(k).loadConstants(filePath);
             }
         }
-        if (e.getActionCommand() == "Save...") {
+        if ("Save...".equals(e.getActionCommand())) {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String dirName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date());
             JFileChooser fc = new JFileChooser();
@@ -418,6 +420,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         frame.setJMenuBar(viewer.menuBar);
         frame.setSize(1400, 800);
         frame.setVisible(true);
+    }
+
+      public long getTriggerWord(DataEvent event) {    	
+ 	    DataBank bank = event.getBank("RUN::config");	        
+        return bank.getLong("trigger", 0);
     }
 
 }

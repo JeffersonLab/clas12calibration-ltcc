@@ -31,14 +31,14 @@ public class CCPixels {
     }
     
     public void init() {
-        System.out.println("CCPixels.init():");
+        // System.out.println("CCPixels.init():");
         Lmap_a.clear();
         Lmap_t.clear();
     }	
     
     public void ccpixdef() {
         
-        System.out.println("CCPixels.ccpixdef():");
+        // System.out.println("CCPixels.ccpixdef():");
 		  
         double   k;
         double   y_inc=19.0;
@@ -93,7 +93,7 @@ public class CCPixels {
 		       
     public void ccpixrot() {
         
-        System.out.println("CCPixels.ccpixrot():");
+        // System.out.println("CCPixels.ccpixrot():");
 		
         double[] theta={270.0,330.0,30.0,90.0,150.0,210.0};
         int nstr = cc_nstr[0];

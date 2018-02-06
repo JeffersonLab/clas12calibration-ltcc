@@ -35,7 +35,6 @@ import org.jlab.utils.groups.IndexedList;import org.jlab.groot.graphics.Embedded
  */
 public class CalibrationModule extends CalibrationEngine implements CalibrationConstantsListener {
     
-    //private final int[] npaddles = new int[]{23,62,5};
     private String                       moduleName = null;
     private CCDetector                     detector = null;
     private CalibrationConstants              calib = null;
@@ -57,7 +56,6 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
     }
 
     public void analyze() {
-
     }    
 
     @Override

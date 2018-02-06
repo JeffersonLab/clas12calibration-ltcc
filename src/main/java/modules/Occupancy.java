@@ -26,9 +26,9 @@ import org.jlab.utils.groups.IndexedList;
  *
  * @author burcu
  */
-public class occupancy extends CalibrationModule {
+public class Occupancy extends CalibrationModule {
 
-    public occupancy(CCDetector d, String name) {
+    public Occupancy(CCDetector d, String name) {
         super(d, name, "offset:offset_error:resolution");
 
     }
@@ -40,15 +40,15 @@ public class occupancy extends CalibrationModule {
 
         for (int iSect : this.getDetector().getSectors()) {
             // initialize data group
-            H2F chanADC = new H2F("chanADC_" , 60, 100.0, 3000.0, 18, 0.5, 36.5);
+            H2F chanADC = new H2F("chanADC_", 60, 100.0, 3000.0, 18, 0.5, 36.5);
             chanADC.setTitleX("Sector" + "_" + iSect + " " + "ADC");
             chanADC.setTitleY("Sector" + "_" + iSect + " " + "channel");
-                  
+
             DataGroup dg = new DataGroup(3, 2);
             dg.addDataSet(chanADC, (iSect - 1));
             this.getDataGroup().add(dg, iSect, 0, 0);
-                }
-            }
+        }
+    }
     
     public int getNEvents(int isec, int order, int icomp) {
         // order indicate left (0) / right (1)
@@ -76,7 +76,7 @@ public class occupancy extends CalibrationModule {
        
                     if (adc > 0 ) {  
                         this.getDataGroup().getItem(sector, 0, 0).getH2F("chanADC_").fill(adc, pmtIndex);
-                        System.out.println("filling : " + sector + " " + order + " " + component);
+                      //  System.out.println("filling : " + sector + " " + order + " " + component);
                    }
                            
                 }
