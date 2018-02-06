@@ -21,10 +21,8 @@ import org.jlab.groot.math.F1D;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.utils.groups.IndexedList;
 
-
 // for mode help on groot:
 // https://github.com/gavalian/groot
-
 /**
  * @author burcu
  */
@@ -329,7 +327,7 @@ public class SPECalibration extends CalibrationModule {
 
         F1D gaussianFit = this.getDataGroup().getItem(sector, side, paddle).getF1D("gaussianFit" + sector + "_" + side + "_" + paddle);
 
-        double mean = gaussianFit.parameter(1).value();
+        double mean   = gaussianFit.parameter(1).value();
         double mean_e = gaussianFit.parameter(1).error();
         double sigma = gaussianFit.parameter(2).value();
         double sigma_e = gaussianFit.parameter(2).error();
