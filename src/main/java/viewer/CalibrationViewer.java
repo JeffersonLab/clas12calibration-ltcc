@@ -60,7 +60,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     JTabbedPane modulePanel = null;
     String moduleSelect = null;
 
-    private int canvasUpdateTime = 2000;
+    private int canvasUpdateTime = 4000;
     private int analysisUpdateTime = 10000;
     private int runNumber = 0;
     private String workDir = "/Users/devita";

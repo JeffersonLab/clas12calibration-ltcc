@@ -10,27 +10,31 @@ public class poissonf extends Func1D {
 
         super(name, min, max);
 
-        addParameter(new UserParameter("amp", 0, 100, 300000));
-        addParameter(new UserParameter("mean", 200, 50, 600));
-        addParameter(new UserParameter("sigma", 10, 20, 400));
+        addParameter(new UserParameter("amp",     0, 100, 300000 ));
+        addParameter(new UserParameter("mean",  200,  50,    600 ));
+        addParameter(new UserParameter("sigma",  10,  20,    400 ));
     }
 
-    public double poissonff(double x, double par[]) {
+    public double evaluate(double x) {
 
-        double arg = 0.0;
+        double c1 = 0.0;
+        double c2 = 0.0;
 
-        if (par[2] != 0) {
-            arg = x / par[2];
+        double par0 = this.getParameter(0);
+        double par1 = this.getParameter(1);
+        double par2 = this.getParameter(2);
+
+        if (par2 != 0) {
+            c1 = x / par2;
         }
 
-        double arg2 = 0.0;
-        double denom = gamma(arg + 1);
+        double denom = gamma(c1 + 1);
 
         if (denom != 0) {
-            arg2 = Math.pow(par[1], arg) / denom;
+            c2 = Math.pow(par1, c1) / denom;
         }
 
-        double poissonValue = par[0] * arg2 * Math.exp(-par[1]);
+        double poissonValue = par0 * c2 * Math.exp(-par1);
 
         return poissonValue;
     }
