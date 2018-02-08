@@ -60,7 +60,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     String moduleSelect = null;
 
     private int canvasUpdateTime = 4000;
-    private int analysisUpdateTime = 10000;
+    private int analysisUpdateTime = 50000;
     private int runNumber = 0;
     private String workDir = "/Users/devita";
 
@@ -124,12 +124,20 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         initDetector();
         detectorPanel.add(detectorView);
 
+        
+        SPECalibration speC = new SPECalibration(detectorView, "SPECalibration");
+        SPESummary speS = new SPESummary(detectorView, "SPESummary");
+        speS.setCalibrationTable(speC.getCalibrationTable());
+        
         // create module viewer: each of these is on one tab
-        //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
-        modules.add(new SPECalibration(detectorView, "SPECalibration"));
         //modules.add(new Occupancy(detectorView, "Occupancy"));
-        modules.add(new SPESummary(detectorView, "SPESummary"));
+        //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
+        modules.add(speC);
+        modules.add(speS);
 
+        
+        
+        
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
             modulePanel.add(modules.get(k).getName(), modules.get(k).getView());
@@ -251,9 +259,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 null,
-                "1000");
+                "5000");
         if (s != null) {
-            int time = 2000;
+            int time = 5000;
             try {
                 time = Integer.parseInt(s);
             } catch (NumberFormatException e) {

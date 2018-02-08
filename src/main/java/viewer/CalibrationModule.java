@@ -102,6 +102,10 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         return calib;
     }
 
+    public void setCalibrationTable(CalibrationConstants cc) {
+        calib = cc;
+    }
+
     public Color getColor(DetectorShape2D dsd) {
         Color col = new Color(100, 100, 100);
         return col;
@@ -147,15 +151,15 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         ccview = new CalibrationConstantsView();
         this.calib = new CalibrationConstants(3, Constants);
         this.calib.setName(name);
-        this.calib.setPrecision(3);
+        this.calib.setPrecision(2);
         this.prevCalib = new CalibrationConstants(3, Constants);
         this.prevCalib.setName(name);
-        this.prevCalib.setPrecision(3);
+        this.prevCalib.setPrecision(2);
         ccview.addConstants(this.getCalibrationConstants().get(0), this);
 
         moduleView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         canvas = new EmbeddedCanvas();
-        canvas.initTimer(2000);
+        canvas.initTimer(4000);
 
         moduleView.setTopComponent(canvas);
         moduleView.setBottomComponent(ccview);

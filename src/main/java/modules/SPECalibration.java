@@ -56,6 +56,7 @@ public class SPECalibration extends CalibrationModule {
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iSide + "_" + iComp, 200, 0.0, 1000.0);
                     speADC.setTitleX("ADC");
                     speADC.setTitleY("Counts");
+
                     String sideString = "Left";
                     if (iSide == 1) {
                         sideString = "Right";
@@ -325,17 +326,18 @@ public class SPECalibration extends CalibrationModule {
 
     private void updateCalibration(int sector, int side, int paddle) {
 
-        F1D gaussianFit = this.getDataGroup().getItem(sector, side, paddle).getF1D("gaussianFit" + sector + "_" + side + "_" + paddle);
+        if (sector != 1 && sector != 4) {
+            F1D gaussianFit = this.getDataGroup().getItem(sector, side, paddle).getF1D("gaussianFit" + sector + "_" + side + "_" + paddle);
 
-        double mean = gaussianFit.parameter(1).value();
-        double mean_e = gaussianFit.parameter(1).error();
-        double sigma = gaussianFit.parameter(2).value();
-        double sigma_e = gaussianFit.parameter(2).error();
+            double mean = gaussianFit.parameter(1).value();
+            double mean_e = gaussianFit.parameter(1).error();
+            double sigma = gaussianFit.parameter(2).value();
+            double sigma_e = gaussianFit.parameter(2).error();
 
-        getCalibrationTable().setDoubleValue(mean, "mean", sector, side, paddle);
-        getCalibrationTable().setDoubleValue(mean_e, "mean_e", sector, side, paddle);
-        getCalibrationTable().setDoubleValue(sigma, "sigma", sector, side, paddle);
-        getCalibrationTable().setDoubleValue(sigma_e, "sigma_e", sector, side, paddle);
-
+            getCalibrationTable().setDoubleValue(mean, "mean", sector, side, paddle);
+            getCalibrationTable().setDoubleValue(mean_e, "mean_e", sector, side, paddle);
+            getCalibrationTable().setDoubleValue(sigma, "sigma", sector, side, paddle);
+            getCalibrationTable().setDoubleValue(sigma_e, "sigma_e", sector, side, paddle);
+        }
     }
 }
