@@ -22,8 +22,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import modules.SPECalibration;
 import modules.SPESummary;
+import modules.EventUtils;
+
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
@@ -46,25 +49,34 @@ import org.jlab.detector.decode.CLASDecoder;
  *
  * @author devita
  */
-public final class CalibrationViewer implements IDataEventListener, ActionListener, DetectorListener, ChangeListener {
-
-    public int i = 0;
+public final class CalibrationViewer implements IDataEventListener, ActionListener, DetectorListener, ChangeListener, EventUtils {
 
     JPanel mainPanel = null;
+
     JMenuBar menuBar = null;
+
     DataSourceProcessorPane processorPane = null;
+
     JSplitPane splitPanel = null;
+
     JPanel detectorPanel = null;
+
     CCDetector detectorView = null;
+
     JTabbedPane modulePanel = null;
+
     String moduleSelect = null;
 
     private int canvasUpdateTime = 4000;
+
     private int analysisUpdateTime = 50000;
+
     private int runNumber = 0;
-    private String workDir = "/Users/devita";
+
+    private final String workDir = "/Users/devita";
 
     ArrayList<CalibrationModule> modules = new ArrayList();
+
     CLASDecoder clasDecoder = new CLASDecoder();
 
     public CalibrationViewer() {
@@ -124,20 +136,16 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         initDetector();
         detectorPanel.add(detectorView);
 
-        
         SPECalibration speC = new SPECalibration(detectorView, "SPECalibration");
         SPESummary speS = new SPESummary(detectorView, "SPESummary");
         speS.setCalibrationTable(speC.getCalibrationTable());
-        
+
         // create module viewer: each of these is on one tab
         //modules.add(new Occupancy(detectorView, "Occupancy"));
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
         modules.add(speC);
         modules.add(speS);
 
-        
-        
-        
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
             modulePanel.add(modules.get(k).getName(), modules.get(k).getView());
@@ -188,7 +196,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         if ("Print histograms to file...".equals(e.getActionCommand())) {
             this.printHistosToFile();
         }
-        
+
         if ("Save histograms...".equals(e.getActionCommand())) {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String fileName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date()) + ".hipo";
@@ -278,7 +286,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     private int getRunNumber(DataEvent event) {
         int rNum = this.runNumber;
         DataBank bank = null;
-        if(event.hasBank("RUN::config")) event.getBank("RUN::config");
+        if (event.hasBank("RUN::config")) {
+            event.getBank("RUN::config");
+        }
         if (bank != null) {
             rNum = bank.getInt("run", 0);
         }
@@ -291,6 +301,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             detectorView.getView().setDetectorListener(layer, this);
         }
         detectorView.updateBox();
+
+        printEventUtils();
+
     }
 
     @Override
@@ -419,6 +432,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         this.detectorView.repaint();
     }
 
+    // main 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Calibration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -428,10 +442,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         frame.setJMenuBar(viewer.menuBar);
         frame.setSize(1400, 800);
         frame.setVisible(true);
+
     }
 
-      public long getTriggerWord(DataEvent event) {    	
- 	    DataBank bank = event.getBank("RUN::config");	        
+    public long getTriggerWord(DataEvent event) {
+        DataBank bank = event.getBank("RUN::config");
         return bank.getLong("trigger", 0);
     }
 
