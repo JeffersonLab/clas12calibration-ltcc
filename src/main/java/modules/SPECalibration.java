@@ -45,12 +45,13 @@ public class SPECalibration extends CalibrationModule {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
 
                     // initialize calibration table
-                    if(iSect != 1 && iSect != 4) this.getCalibrationTable().addEntry(iSect, iSide, iComp);
-                    getCalibrationTable().setDoubleValue(200.0, "mean", iSect, iSide, iComp);
-                    getCalibrationTable().setDoubleValue(10.0, "mean_e", iSect, iSide, iComp);
-                    getCalibrationTable().setDoubleValue(20.0, "sigma", iSect, iSide, iComp);
-                    getCalibrationTable().setDoubleValue(2.0, "sigma_e", iSect, iSide, iComp);
-
+                    if (iSect != 1 && iSect != 4) {
+                        getCalibrationTable().addEntry(iSect, iSide, iComp);
+                        getCalibrationTable().setDoubleValue(200.0, "mean", iSect, iSide, iComp);
+                        getCalibrationTable().setDoubleValue(10.0, "mean_e", iSect, iSide, iComp);
+                        getCalibrationTable().setDoubleValue(20.0, "sigma", iSect, iSide, iComp);
+                        getCalibrationTable().setDoubleValue(2.0, "sigma_e", iSect, iSide, iComp);
+                    }
                     // initialize data group
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iSide + "_" + iComp, 200, 0.0, 1000.0);
                     speADC.setTitleX("ADC");
@@ -326,7 +327,7 @@ public class SPECalibration extends CalibrationModule {
 
         F1D gaussianFit = this.getDataGroup().getItem(sector, side, paddle).getF1D("gaussianFit" + sector + "_" + side + "_" + paddle);
 
-        double mean   = gaussianFit.parameter(1).value();
+        double mean = gaussianFit.parameter(1).value();
         double mean_e = gaussianFit.parameter(1).error();
         double sigma = gaussianFit.parameter(2).value();
         double sigma_e = gaussianFit.parameter(2).error();
