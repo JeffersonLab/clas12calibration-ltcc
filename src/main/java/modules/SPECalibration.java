@@ -19,7 +19,6 @@ import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 import org.jlab.groot.math.F1D;
 import org.jlab.groot.fitter.DataFitter;
-import org.jlab.utils.groups.IndexedList;
 
 // for mode help on groot:
 // https://github.com/gavalian/groot
@@ -46,7 +45,7 @@ public class SPECalibration extends CalibrationModule {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
 
                     // initialize calibration table
-                    this.getCalibrationTable().addEntry(iSect, iSide, iComp);
+                    if(iSect != 1 && iSect != 4) this.getCalibrationTable().addEntry(iSect, iSide, iComp);
                     getCalibrationTable().setDoubleValue(200.0, "mean", iSect, iSide, iComp);
                     getCalibrationTable().setDoubleValue(10.0, "mean_e", iSect, iSide, iComp);
                     getCalibrationTable().setDoubleValue(20.0, "sigma", iSect, iSide, iComp);

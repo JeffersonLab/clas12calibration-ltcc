@@ -5,22 +5,14 @@
  */
 package modules;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import view.DetectorShape2D;
 import viewer.CalibrationModule;
 import viewer.CCDetector;
 import org.jlab.detector.calib.utils.CalibrationConstants;
-import org.jlab.groot.base.ColorPalette;
 import org.jlab.groot.data.GraphErrors;
-import org.jlab.groot.data.H1F;
 import org.jlab.groot.group.DataGroup;
-import org.jlab.io.base.DataBank;
-import org.jlab.io.base.DataEvent;
-import org.jlab.groot.math.F1D;
-import org.jlab.groot.fitter.DataFitter;
-import org.jlab.utils.groups.IndexedList;
 
 // for mode help on groot:
 // https://github.com/gavalian/groot
@@ -53,7 +45,6 @@ public class SPESummary extends CalibrationModule {
 
             DataGroup dg = new DataGroup(2, 2);
             dg.addDataSet(spePositions, 0);
-
             this.getDataGroup().add(dg, iSect, 0, 0);
 
         }
@@ -81,23 +72,33 @@ public class SPESummary extends CalibrationModule {
         // layer is 1, 2 in the detector shape. It is 0, 1, in the histo (order
         int side = dsd.getDescriptor().getLayer() - 1;
 
-        this.getCanvas().divide(2, 2);
-
-        GraphErrors spePos = getGraphFromDataDataGroup("spePositions", sector);
-        spePos.reset();
-
-        // System.out.println("Selected shape " + sector + " " + layer + " " + paddle);
-        for (int pmt = 1; pmt < 19; pmt++) {
-            spePos.addPoint(pmt, getCalibrationTable().getDoubleValue("mean", sector, side, pmt), 0, getCalibrationTable().getDoubleValue("mean_e", sector, side, pmt));
-
-        }
-        this.getCanvas().draw(spePos);
-
     }
 
     @Override
     public void timerUpdate() {
-        analyze();
+        int[] availableSectors = new int[4];
+        availableSectors[0] = 2;
+        availableSectors[1] = 3;
+        availableSectors[2] = 5;
+        availableSectors[3] = 6;
+
+        this.getCanvas().divide(2, 2);
+
+        for (int iSect = 0; iSect < 4; iSect++) {
+            GraphErrors spePos = getGraphFromDataDataGroup("spePositions", availableSectors[iSect]);
+            spePos.reset();
+            for (int iSide = 0; iSide < 2; iSide++) {
+                for (int pmt = 1; pmt < 19; pmt++) {
+                    int iPmt = pmt + iSide * 18;
+                    spePos.addPoint(iPmt, getCalibrationTable().getDoubleValue("mean", availableSectors[iSect], iSide, pmt),
+                            0, getCalibrationTable().getDoubleValue("mean_e", availableSectors[iSect], iSide, pmt));
+                }
+            }
+            this.getCanvas().cd(iSect);
+            this.getCanvas().draw(spePos);
+
+        }
+
     }
 
 }
