@@ -26,6 +26,7 @@ import javax.swing.event.ChangeListener;
 import modules.SPECalibration;
 import modules.SPESummary;
 import modules.EventUtils;
+import modules.Occupancy;
 
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
@@ -140,11 +141,13 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         SPESummary speS = new SPESummary(detectorView, "SPESummary");
         speS.setCalibrationTable(speC.getCalibrationTable());
 
+        Occupancy pmtOccupancy = new Occupancy(detectorView, "Occupancy");
+        
         // create module viewer: each of these is on one tab
-        //modules.add(new Occupancy(detectorView, "Occupancy"));
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
         modules.add(speC);
         modules.add(speS);
+        modules.add(pmtOccupancy);
 
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
@@ -176,7 +179,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
-        if (e.getActionCommand() == "Set analysis update interval...") {
+        if ("Set analysis update interval...".equals(e.getActionCommand())) {
             this.chooseUpdateInterval();
         }
         if (e.getActionCommand() == "Open histograms file...") {
