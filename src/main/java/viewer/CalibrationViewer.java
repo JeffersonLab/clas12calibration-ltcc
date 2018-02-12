@@ -81,6 +81,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     CLASDecoder clasDecoder = new CLASDecoder();
 
+    LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
+
     public CalibrationViewer() {
 
         // create main panel
@@ -143,9 +145,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         speS.setCalibrationTable(speC.getCalibrationTable());
 
         Occupancy pmtOccupancy = new Occupancy(detectorView, "Occupancy");
-        
-        LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
-        
+
         // create module viewer: each of these is on one tab
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
         modules.add(speC);
@@ -340,7 +340,12 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         }
 
         for (int k = 0; k < this.modules.size(); k++) {
-            this.modules.get(k).dataEventAction(hipo);
+            if (this.modules.contains(ltccPulses)) {
+                this.modules.get(k).dataEventAction(de);
+
+            } else {
+                this.modules.get(k).dataEventAction(hipo);
+            }
         }
 
         this.detectorView.repaint();
