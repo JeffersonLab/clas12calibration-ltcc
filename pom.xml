@@ -14,8 +14,8 @@
       </dependency>
         <dependency>
             <groupId>org.jlab.clas</groupId>
-            <artifactId>clas-io</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <artifactId>common-tools</artifactId>
+            <version>0.0</version>
             <type>jar</type>
         </dependency>
     </dependencies> 

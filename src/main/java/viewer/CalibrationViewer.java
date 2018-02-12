@@ -27,6 +27,7 @@ import modules.SPECalibration;
 import modules.SPESummary;
 import modules.EventUtils;
 import modules.Occupancy;
+import modules.LTCCPulses;
 
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
@@ -143,11 +144,14 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         Occupancy pmtOccupancy = new Occupancy(detectorView, "Occupancy");
         
+        LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
+        
         // create module viewer: each of these is on one tab
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
         modules.add(speC);
         modules.add(speS);
         modules.add(pmtOccupancy);
+        modules.add(ltccPulses);
 
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
