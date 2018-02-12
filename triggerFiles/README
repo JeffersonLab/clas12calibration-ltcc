@@ -1,0 +1,17 @@
+Latest trigger file: 2/12/18
+----------------------------
+
+FADC Thresholds:
+
+The trigger files are located in
+
+$CLON_PARMS/trigger/
+
+
+The LTCC slots are in EC crates
+
+Slot 18 has last 4 channels LTCC and 12 EC
+Slot 19, 20 are entirely LTCC
+
+
+
