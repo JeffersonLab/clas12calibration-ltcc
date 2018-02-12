@@ -5,7 +5,7 @@ FADC Thresholds:
 
 The trigger files are located in
 
-$CLON_PARMS/trigger/
+$CLON_PARMS/trigger/LTCC
 
 
 The LTCC slots are in EC crates
