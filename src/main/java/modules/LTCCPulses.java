@@ -86,7 +86,8 @@ public class LTCCPulses extends CalibrationModule {
         if (event instanceof EvioDataEvent) {
 
             List<DetectorDataDgtz> dataList = decoder.getDataEntries((EvioDataEvent) event);
-            detectorDecoder.translate(dataList);
+            detectorDecoder.translate(dataList);  // to decode the wave
+            detectorDecoder.fitPulses(dataList);  // to decode the pedestals as well
 
             List<DetectorDataDgtz> counters = new ArrayList<>();
 
@@ -103,17 +104,20 @@ public class LTCCPulses extends CalibrationModule {
 
             // looping over LTCC counters
             for (DetectorDataDgtz counter : counters) {
+
                 int sector = counter.getDescriptor().getSector();
                 int side = counter.getDescriptor().getOrder();
                 int pmt = counter.getDescriptor().getComponent();
 
-                //               System.out.println(" sector " + sector + "   side " + side + " pmt " + pmt);
                 H1F ltccPulse = this.getHistogramFromDataDataGroup("ltccPulse_", sector, side, pmt);
 
                 short pulse[] = counter.getADCData(0).getPulseArray();
+                int pedestal = counter.getADCData(0).getPedestal();
+
+                // System.out.println(" sector " + sector + "   side " + side + " pmt " + pmt + " pedestal " + pedestal);
 
                 for (int i = 0; i < pulse.length; i++) {
-                    ltccPulse.fill(i, pulse[i]);
+                    ltccPulse.fill(i, pulse[i] - pedestal);
                 }
             }
         }
