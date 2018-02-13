@@ -30,6 +30,7 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
 import org.jlab.utils.groups.IndexedList;
 import org.jlab.groot.graphics.EmbeddedCanvas;
+import org.jlab.io.evio.EvioDataEvent;
 
 /**
  *
@@ -50,6 +51,8 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
     private int nProcessed = 0;
     private int nLayers;
     private int nSegments;
+
+    public boolean isCooked = false;
 
     public CalibrationModule(CCDetector d, String ModuleName, String Constants) {
         this.detector = d;
@@ -170,8 +173,16 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
     @Override
     public void dataEventAction(DataEvent event) {
         nProcessed++;
+
+        // not best way?
+        if (event instanceof EvioDataEvent) {
+            isCooked = false;
+        } else {
+            isCooked = true;
+        }
+        
         if (event.getType() == DataEventType.EVENT_START) {
-            System.out.println("EVENT_START");
+            System.out.println("Start event in Module Data Event Action" + isCooked);
             resetEventListener();
             processEvent(event);
         } else if (event.getType() == DataEventType.EVENT_ACCUMULATE) {

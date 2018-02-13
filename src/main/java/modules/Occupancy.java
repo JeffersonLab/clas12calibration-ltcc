@@ -49,40 +49,43 @@ public class Occupancy extends CalibrationModule {
             this.getDataGroup().add(dg, iSect, 0, 0);
         }
     }
-    
+
     public int getNEvents(int isec, int order, int icomp) {
         // order indicate left (0) / right (1)
         // 1-18 left side; 19-36 right side
         // in the past it was 1 = 1 left, 2 = 1 right, etc
-            int pmtIndex = (order * 18) + icomp;
-            return this.getDataGroup().getItem(isec, 0, 0).getH2F("chanADC_").getEntries();    
+        int pmtIndex = (order * 18) + icomp;
+        return this.getDataGroup().getItem(isec, 0, 0).getH2F("chanADC_").getEntries();
     }
-    
+
     public int nevents;
 
     @Override
     public void processEvent(DataEvent event) {
         nevents++;
-        
-        if (event.hasBank("LTCC::adc") == true) {
-            DataBank bank = event.getBank("LTCC::adc");
-            int nhits = bank.rows();
-            for (int hitNum = 0; hitNum < nhits; hitNum++) {
-                int sector = bank.getByte("sector", hitNum);
-                int order  = bank.getByte("order", hitNum);
-                int component = bank.getShort("component", hitNum);
-                int adc = bank.getInt("ADC", hitNum) ;
-                int pmtIndex = (order * 18) + component;
-       
-                    if (adc > 0 ) {  
+
+        if (isCooked) {
+
+            if (event.hasBank("LTCC::adc")) {
+                DataBank bank = event.getBank("LTCC::adc");
+                int nhits = bank.rows();
+                for (int hitNum = 0; hitNum < nhits; hitNum++) {
+                    int sector = bank.getByte("sector", hitNum);
+                    int order = bank.getByte("order", hitNum);
+                    int component = bank.getShort("component", hitNum);
+                    int adc = bank.getInt("ADC", hitNum);
+                    int pmtIndex = (order * 18) + component;
+
+                    if (adc > 0) {
                         this.getDataGroup().getItem(sector, 0, 0).getH2F("chanADC_").fill(adc, pmtIndex);
-                      //  System.out.println("filling : " + sector + " " + order + " " + component);
-                   }
-                           
+                        //  System.out.println("filling : " + sector + " " + order + " " + component);
+                    }
+
                 }
             }
         }
-   
+    }
+
     public void analyze() {
         System.out.println("Analyzing");
 
@@ -98,7 +101,7 @@ public class Occupancy extends CalibrationModule {
             }
         }
     }
-    
+
     @Override
     public void processShape(DetectorShape2D dsd) {
 
@@ -113,22 +116,22 @@ public class Occupancy extends CalibrationModule {
         IndexedList<DataGroup> group = this.getDataGroup();
 
         if (group.hasItem(sector, 0, 0) == true) {
-            if (sector  == 6) {
+            if (sector == 6) {
                 this.getCanvas().clear();
             }
-            
+
             for (sector = 1; sector <= 6; sector++) {
                 this.getCanvas().divide(3, 2);
                 this.getCanvas().cd((sector - 1));
-                this.getCanvas().getPad(sector-1).getAxisZ().setLog(true);
+                this.getCanvas().getPad(sector - 1).getAxisZ().setLog(true);
                 this.getCanvas().draw(this.getDataGroup().getItem(sector, 0, 0).getH2F("chanADC_"));
-                
+
             }
-        }else {
+        } else {
             System.out.println(" ERROR: can not find the data group");
         }
-            }
-   
+    }
+
     @Override
     public Color getColor(DetectorShape2D dsd) {
         // show summary
@@ -145,6 +148,7 @@ public class Occupancy extends CalibrationModule {
 
         return col;
     }
+
     @Override
     public void timerUpdate() {
         analyze();

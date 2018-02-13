@@ -115,21 +115,24 @@ public class SPECalibration extends CalibrationModule {
         //       long triggerWord = triggerBank.getLong("trigger", 11);
         // System.out.println("trigger word: " + triggerWord);
         // System.out.println(nEventsProcessed);
-        if (event.hasBank("LTCC::adc") == true) {
-            DataBank bank = event.getBank("LTCC::adc");
+        if(isCooked) {
 
-            // number of hits in the event
-            int nHitsInEvent = bank.rows();
-            for (int hitIndex = 0; hitIndex < nHitsInEvent; hitIndex++) {
+            if (event.hasBank("LTCC::adc")) {
+                DataBank bank = event.getBank("LTCC::adc");
 
-                int sector = bank.getByte("sector", hitIndex);
-                int order = bank.getByte("order", hitIndex);
-                int component = bank.getShort("component", hitIndex);
+                // number of hits in the event
+                int nHitsInEvent = bank.rows();
+                for (int hitIndex = 0; hitIndex < nHitsInEvent; hitIndex++) {
 
-                int adc = bank.getInt("ADC", hitIndex);
+                    int sector = bank.getByte("sector", hitIndex);
+                    int order = bank.getByte("order", hitIndex);
+                    int component = bank.getShort("component", hitIndex);
 
-                if (sector > 0 && (order == 0 || order == 1) && component > 0 && adc > 0) {
-                    this.getHistogramFromDataDataGroup("speADC_", sector, order, component).fill(adc);
+                    int adc = bank.getInt("ADC", hitIndex);
+
+                    if (sector > 0 && (order == 0 || order == 1) && component > 0 && adc > 0) {
+                        this.getHistogramFromDataDataGroup("speADC_", sector, order, component).fill(adc);
+                    }
                 }
             }
         }

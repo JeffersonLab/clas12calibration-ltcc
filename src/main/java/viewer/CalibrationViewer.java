@@ -81,8 +81,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     CLASDecoder clasDecoder = new CLASDecoder();
 
-    LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
-
     public CalibrationViewer() {
 
         // create main panel
@@ -145,6 +143,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         speS.setCalibrationTable(speC.getCalibrationTable());
 
         Occupancy pmtOccupancy = new Occupancy(detectorView, "Occupancy");
+
+        LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
 
         // create module viewer: each of these is on one tab
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
@@ -294,7 +294,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         int rNum = this.runNumber;
         DataBank bank = null;
         if (event.hasBank("RUN::config")) {
-            event.getBank("RUN::config");
+            bank = event.getBank("RUN::config");
         }
         if (bank != null) {
             rNum = bank.getInt("run", 0);
@@ -331,6 +331,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             // System.out.println(" EVENT_STOP else");
             // System.out.println(" Analyzed");
         }
+        // this should be taken care in each module instead?
+        // each modules knows what type of data it needs
         if (de instanceof EvioDataEvent) {
             hipo = (HipoDataEvent) clasDecoder.getDataEvent(de);
             DataBank header = clasDecoder.createHeaderBank(hipo, 0, 0, (float) 0, (float) 0);
@@ -338,11 +340,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         } else {
             hipo = (HipoDataEvent) de;
         }
-
+        
+        
         for (int k = 0; k < this.modules.size(); k++) {
-            if (this.modules.contains(ltccPulses)) {
+            if (de instanceof EvioDataEvent) {
                 this.modules.get(k).dataEventAction(de);
-
             } else {
                 this.modules.get(k).dataEventAction(hipo);
             }

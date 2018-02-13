@@ -18,6 +18,8 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.io.evio.EvioDataEvent;
 import org.jlab.detector.decode.DetectorDataDgtz;
 import org.jlab.detector.decode.CodaEventDecoder;
+import org.jlab.detector.decode.DetectorEventDecoder;
+
 import org.jlab.detector.base.DetectorType;
 
 // for mode help on groot:
@@ -34,6 +36,7 @@ public class LTCCPulses extends CalibrationModule {
     // event processed
     public int nEventsProcessed;
     CodaEventDecoder decoder = new CodaEventDecoder();
+    DetectorEventDecoder detectorDecoder = new DetectorEventDecoder();
 
     // define histos
     @Override
@@ -46,7 +49,7 @@ public class LTCCPulses extends CalibrationModule {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
 
                     // initialize data group
-                    H1F ltccPulse = new H1F("speADC_" + iSect + "_" + iSide + "_" + iComp, 100, 0.0, 100.0);
+                    H1F ltccPulse = new H1F("ltccPulse_" + iSect + "_" + iSide + "_" + iComp, 100, 0.0, 100.0);
                     ltccPulse.setTitleX("time bunch");
                     ltccPulse.setTitleY("ADC");
 
@@ -67,21 +70,31 @@ public class LTCCPulses extends CalibrationModule {
         return Arrays.asList(getCalibrationTable());
     }
 
+    // the second argument means I can call this function with an index[3] or with an explicity list like sector,layer,component
+    private H1F getHistogramFromDataDataGroup(String histoName, int... index) {
+        // int[] index = new int[3]; << this is how a new array is defined in java
+        // for(int i = 0; i < index.length; i++) System.out.println( index[i]);
+        return this.getDataGroup().getItem(index[0], index[1], index[2]).getH1F(histoName + index[0] + "_" + index[1] + "_" + index[2]);
+    }
+
     @Override
     public void processEvent(DataEvent event) {
 
         nEventsProcessed++;
 
-                        System.out.println(" inside ltcc pulses"  );
-
         // getting pulses
         if (event instanceof EvioDataEvent) {
+
             List<DetectorDataDgtz> dataList = decoder.getDataEntries((EvioDataEvent) event);
+            detectorDecoder.translate(dataList);
+
             List<DetectorDataDgtz> counters = new ArrayList<>();
 
             // filling counters with LTCC only data
             for (DetectorDataDgtz entry : dataList) {
+
                 if (entry.getDescriptor().getType() == DetectorType.LTCC) {
+
                     if (entry.getADCSize() > 0) {
                         counters.add(entry);
                     }
@@ -91,11 +104,19 @@ public class LTCCPulses extends CalibrationModule {
             // looping over LTCC counters
             for (DetectorDataDgtz counter : counters) {
                 int sector = counter.getDescriptor().getSector();
-                int layer = counter.getDescriptor().getSector();
-                int component = counter.getDescriptor().getSector();
+                int side = counter.getDescriptor().getOrder();
+                int pmt = counter.getDescriptor().getComponent();
 
-                System.out.println(" sector " + sector + "   layer " + layer + " component " + component );
+//                System.out.println(" sector " + sector + "   side " + side + " pmt " + pmt);
+                H1F ltccPulse = this.getHistogramFromDataDataGroup("ltccPulse_", sector, side, pmt);
 
+                short pulse[] = counter.getADCData(0).getPulseArray();
+
+                for (int i = 0; i < pulse.length; i++) {
+               //     ltccPulse.setBinContent(i, pulse[i]);
+                    ltccPulse.fill(i, pulse[i]);
+                    
+                }
             }
         }
 
@@ -109,6 +130,31 @@ public class LTCCPulses extends CalibrationModule {
         int sector = dsd.getDescriptor().getSector();
         // layer is 1, 2 in the detector shape. It is 0, 1, in the histo (order
         int side = dsd.getDescriptor().getLayer() - 1;
+        this.getCanvas().divide(6, 3);
+
+        // System.out.println("Selected shape " + sector + " " + layer + " " + paddle);
+        for (int paddle = 1; paddle < 19; paddle++) {
+            if (this.getDataGroup().hasItem(sector, side, paddle) == true) {
+                this.getCanvas().cd(paddle - 1);
+                H1F speADC = this.getHistogramFromDataDataGroup("ltccPulse_", sector, side, paddle);
+                this.getCanvas().draw(speADC);
+
+                // not working yet
+//                H1F fitParHisto = this.getHistogramFromDataDataGroup("fitpars_", sector, side, paddle);
+//                System.out.println(" Fit Parameter 0: " + fitParHisto.getBinContent(0));
+//                System.out.println(" Fit Parameter 1: " + fitParHisto.getBinContent(1));
+//                System.out.println(" Fit Parameter 2: " + fitParHisto.getBinContent(2));
+//
+//                poissonf poissonfFitF = new poissonf("poissonfFitF_" + sector + "_" + side + "_" + paddle, 10, 600);
+//                poissonfFitF.setParameter(0, fitParHisto.getBinContent(0));
+//                poissonfFitF.setParameter(1, fitParHisto.getBinContent(1));
+//                poissonfFitF.setParameter(2, fitParHisto.getBinContent(2));
+//                this.getCanvas().draw(poissonfFitF, "same");
+            } else {
+                System.out.println(" ERROR: can not find the data group for sector " + sector);
+            }
+
+        }
 
     }
 
