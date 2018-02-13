@@ -12,12 +12,6 @@
         <version>5.1-SNAPSHOT</version>
          <type>jar</type>
       </dependency>
-        <dependency>
-            <groupId>org.jlab.clas</groupId>
-            <artifactId>common-tools</artifactId>
-            <version>0.0</version>
-            <type>jar</type>
-        </dependency>
     </dependencies> 
 
     <repositories>

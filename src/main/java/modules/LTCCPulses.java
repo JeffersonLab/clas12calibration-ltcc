@@ -107,15 +107,13 @@ public class LTCCPulses extends CalibrationModule {
                 int side = counter.getDescriptor().getOrder();
                 int pmt = counter.getDescriptor().getComponent();
 
-//                System.out.println(" sector " + sector + "   side " + side + " pmt " + pmt);
+                //               System.out.println(" sector " + sector + "   side " + side + " pmt " + pmt);
                 H1F ltccPulse = this.getHistogramFromDataDataGroup("ltccPulse_", sector, side, pmt);
 
                 short pulse[] = counter.getADCData(0).getPulseArray();
 
                 for (int i = 0; i < pulse.length; i++) {
-               //     ltccPulse.setBinContent(i, pulse[i]);
                     ltccPulse.fill(i, pulse[i]);
-                    
                 }
             }
         }
@@ -136,20 +134,19 @@ public class LTCCPulses extends CalibrationModule {
         for (int paddle = 1; paddle < 19; paddle++) {
             if (this.getDataGroup().hasItem(sector, side, paddle) == true) {
                 this.getCanvas().cd(paddle - 1);
-                H1F speADC = this.getHistogramFromDataDataGroup("ltccPulse_", sector, side, paddle);
-                this.getCanvas().draw(speADC);
+                H1F ltccPulse = this.getHistogramFromDataDataGroup("ltccPulse_", sector, side, paddle);
 
-                // not working yet
-//                H1F fitParHisto = this.getHistogramFromDataDataGroup("fitpars_", sector, side, paddle);
-//                System.out.println(" Fit Parameter 0: " + fitParHisto.getBinContent(0));
-//                System.out.println(" Fit Parameter 1: " + fitParHisto.getBinContent(1));
-//                System.out.println(" Fit Parameter 2: " + fitParHisto.getBinContent(2));
-//
-//                poissonf poissonfFitF = new poissonf("poissonfFitF_" + sector + "_" + side + "_" + paddle, 10, 600);
-//                poissonfFitF.setParameter(0, fitParHisto.getBinContent(0));
-//                poissonfFitF.setParameter(1, fitParHisto.getBinContent(1));
-//                poissonfFitF.setParameter(2, fitParHisto.getBinContent(2));
-//                this.getCanvas().draw(poissonfFitF, "same");
+                H1F normalizedPulse = ltccPulse.histClone("normalized");
+
+                System.out.println(" sector " + sector + "   side " + side + " pmt " + paddle + " entries: " + ltccPulse.getEntries() / 100);
+
+                //   every event gives 100 entries 
+                if (ltccPulse.getEntries() > 0) {
+                    normalizedPulse.divide(ltccPulse.getEntries() / 100);
+                }
+
+                this.getCanvas().draw(normalizedPulse);
+
             } else {
                 System.out.println(" ERROR: can not find the data group for sector " + sector);
             }
