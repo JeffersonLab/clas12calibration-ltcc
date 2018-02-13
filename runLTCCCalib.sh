@@ -3,7 +3,7 @@
 hostname=$(hostname)
 
 if [[ $hostname == "clonsl2.jlab.org" ]]; then
-	COATJAVA=/home/clasrun/CLARA/4a.8.3/plugins/clas12 ; export COATJAVA
+	COATJAVA=/home/clasrun/LTCC/coatjava ; export COATJAVA
 fi
 
 # distribution directory: same as launched
