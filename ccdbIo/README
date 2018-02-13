@@ -1,0 +1,13 @@
+* The output of the script is the LTCC_HV.txt file.
+
+* The LTCC_HV.txt file contains a table with sector, side, component and HV information. 
+
+* To upload it to the ccdb: 
+
+    ** The command to create a table 
+    
+       ccdb -c mysql://clas12writer:geom3try@clasdb/clas12 mktbl /test/cc_calib/ltcc/ltcchv -r 180 sector=int side=int component=int hv=double #ltcc table
+
+    ** To add the text file to that table:
+
+       ccdb -c mysql://clas12writer:geom3try@clasdb/clas12 -v mc add test/cc_calib/ltcc LTCC_HV.txt
