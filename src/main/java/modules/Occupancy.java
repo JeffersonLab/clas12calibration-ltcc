@@ -105,6 +105,12 @@ public class Occupancy extends CalibrationModule {
     @Override
     public void processShape(DetectorShape2D dsd) {
 
+        int[] availableSectors = new int[4];
+        availableSectors[0] = 2;
+        availableSectors[1] = 3;
+        availableSectors[2] = 5;
+        availableSectors[3] = 6;
+
         //plot histos for each sector
         int sector = dsd.getDescriptor().getSector();
         // layer is 1, 2 in the detector shape. It is 0, 1, in the histo order
@@ -115,18 +121,17 @@ public class Occupancy extends CalibrationModule {
         System.out.println("Selected shape " + sector + " " + pmtIndex);
         IndexedList<DataGroup> group = this.getDataGroup();
 
+        this.getCanvas().divide(2, 2);
+
         if (group.hasItem(sector, 0, 0) == true) {
-            if (sector == 6) {
-                this.getCanvas().clear();
-            }
 
-            for (sector = 1; sector <= 6; sector++) {
-                this.getCanvas().divide(3, 2);
-                this.getCanvas().cd((sector - 1));
-                this.getCanvas().getPad(sector - 1).getAxisZ().setLog(true);
-                this.getCanvas().draw(this.getDataGroup().getItem(sector, 0, 0).getH2F("chanADC_"));
+            for (int iSect = 0; iSect < 4; iSect++) {
+                this.getCanvas().cd(iSect);
+                this.getCanvas().getPad(iSect).getAxisZ().setLog(true);
+                this.getCanvas().draw(this.getDataGroup().getItem(availableSectors[iSect], 0, 0).getH2F("chanADC_"));
+          }
 
-            }
+            
         } else {
             System.out.println(" ERROR: can not find the data group");
         }
@@ -134,6 +139,7 @@ public class Occupancy extends CalibrationModule {
 
     @Override
     public Color getColor(DetectorShape2D dsd) {
+
         // show summary
         int sector = dsd.getDescriptor().getSector();
         int layer = dsd.getDescriptor().getLayer();
