@@ -1,17 +1,35 @@
-Latest trigger file: 2/12/18
-----------------------------
 
-FADC Thresholds:
+FADC Trigger configuration for LTCC
+-----------------------------------
 
 The trigger files are located in
 
 $CLON_PARMS/trigger/LTCC
 
+To run the LTCC calibration, use the random trigger.
 
-The LTCC slots are in EC crates
+DAQ configuration for random trigger:
 
-Slot 18 has last 4 channels LTCC and 12 EC
-Slot 19, 20 are entirely LTCC
+Configuration: PROD_noVTP
+Config filename: ltcc_calib_random.trg
+
+This will produce a file ltcc_calib_random.cnf which includes everything loaded in the trigger. It is also saved in the data.
+
+The file loaded by ltcc_calib_random.trg is ltcc_calib.cnf which in turns loads:
+
+- TS, TDC, FADC various....ltcc_calib_various.cnf
+- masks to ignore EC.......ltcc_calib_masks.cnf
+- thresholds...............ltcc_calib_thresholds.cnf
+
+
+To check the configuration for a particular slot:
+
+fadc250 adcecal5 mon 18
+
+
+
+
+
 
 
 
