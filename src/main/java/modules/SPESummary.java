@@ -76,6 +76,8 @@ public class SPESummary extends CalibrationModule {
 
     @Override
     public void timerUpdate() {
+        
+        // make this in LTCC Module?
         int[] availableSectors = new int[4];
         availableSectors[0] = 2;
         availableSectors[1] = 3;
