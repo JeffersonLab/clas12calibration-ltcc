@@ -6,9 +6,12 @@
 package view;
 
 /**
- *
  * @author gavalian
  */
+
+
+// interface that the various classes have to implement
+// to recognize touches in the DetectorShape2D
 public interface DetectorListener {
     void update(DetectorShape2D shape);
     void processShape(DetectorShape2D shape);

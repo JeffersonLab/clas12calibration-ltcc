@@ -11,6 +11,22 @@
 #
 # Setting sector 1 and 4 to very high thresholds, to make sure EC does not fire
 
+<<<<<<< HEAD
+=======
+FADC250_CRATE adcecal1
+FADC250_SLOT all
+FADC250_NSB 12
+FADC250_NSA 60
+FADC250_TET 400
+FADC250_CRATE end
+
+FADC250_CRATE adcecal4
+FADC250_SLOT all
+FADC250_NSB 12
+FADC250_NSA 60
+FADC250_TET 400
+FADC250_CRATE end
+>>>>>>> 8b2205ff8186ea041a9dd7bcaee73f0d2b77ebf2
 
 FADC250_CRATE adcecal2
 FADC250_SLOT 18

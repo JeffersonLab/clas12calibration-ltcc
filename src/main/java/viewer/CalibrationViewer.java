@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -30,7 +31,6 @@ import modules.Occupancy;
 import modules.LTCCPulses;
 
 import org.jlab.io.base.DataEvent;
-import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
 import org.jlab.io.task.IDataEventListener;
 import view.DetectorListener;
@@ -48,8 +48,7 @@ import org.jlab.detector.decode.CLASDecoder;
  * and open the template in the editor.
  */
 /**
- *
- * @author devita
+ * @author ungaro
  */
 public final class CalibrationViewer implements IDataEventListener, ActionListener, DetectorListener, ChangeListener, EventUtils {
 
@@ -60,8 +59,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     DataSourceProcessorPane processorPane = null;
 
     JSplitPane splitPanel = null;
-
-    JPanel detectorPanel = null;
 
     CCDetector detectorView = null;
 
@@ -75,11 +72,14 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     private int runNumber = 0;
 
-    private final String workDir = "/Users/devita";
+    private final String workDir = ".";
 
     ArrayList<CalibrationModule> modules = new ArrayList();
 
     CLASDecoder clasDecoder = new CLASDecoder();
+
+    // if it's calibration than we do not need to analyse the pulse?
+    JButton isItCalibration;
 
     public CalibrationViewer() {
 
@@ -89,42 +89,39 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         // create menu bar
         menuBar = new JMenuBar();
-        JMenuItem menuItem;
+
+        // Constants
         JMenu constants = new JMenu("Constants");
-        menuItem = new JMenuItem("Load...", KeyEvent.VK_L);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Load constants from file");
-        menuItem.addActionListener(this);
-        constants.add(menuItem);
-        menuItem = new JMenuItem("Save...", KeyEvent.VK_S);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Save constants to file");
-        menuItem.addActionListener(this);
-        constants.add(menuItem);
+        constants.add(createMenuItem("Load Constants", "Load Constants from file", KeyEvent.VK_L));
+        constants.add(createMenuItem("Save Constants", "Save Constants to file", KeyEvent.VK_S));
         menuBar.add(constants);
-        JMenu file = new JMenu("Histograms");
-        file.setMnemonic(KeyEvent.VK_A);
-        file.getAccessibleContext().setAccessibleDescription("File options");
-        menuItem = new JMenuItem("Open histograms file...", KeyEvent.VK_O);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
-        menuItem.addActionListener(this);
-        file.add(menuItem);
-        menuItem = new JMenuItem("Print histograms to file...", KeyEvent.VK_P);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Print histograms to file");
-        menuItem.addActionListener(this);
-        file.add(menuItem);
-        menuItem = new JMenuItem("Save histograms...", KeyEvent.VK_H);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
-        menuItem.addActionListener(this);
-        file.add(menuItem);
-        menuBar.add(file);
+
+//        // Histograms
+//        JMenu file = new JMenu("Histograms");
+//        file.setMnemonic(KeyEvent.VK_A);
+//        file.getAccessibleContext().setAccessibleDescription("File options");
+//        menuItem = new JMenuItem("Open histograms file...", KeyEvent.VK_O);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+//        menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
+//        menuItem.addActionListener(this);
+//        file.add(menuItem);
+//        menuItem = new JMenuItem("Print histograms to file...", KeyEvent.VK_P);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+//        menuItem.getAccessibleContext().setAccessibleDescription("Print histograms to file");
+//        menuItem.addActionListener(this);
+//        file.add(menuItem);
+//        menuItem = new JMenuItem("Save histograms...", KeyEvent.VK_H);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+//        menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
+//        menuItem.addActionListener(this);
+//        file.add(menuItem);
+//        
+//        menuBar.add(file);
+        // Settings
         JMenu settings = new JMenu("Settings");
         settings.setMnemonic(KeyEvent.VK_A);
         settings.getAccessibleContext().setAccessibleDescription("Choose monitoring parameters");
-        menuItem = new JMenuItem("Set analysis update interval...", KeyEvent.VK_T);
+        JMenuItem menuItem = new JMenuItem("Set analysis update interval...", KeyEvent.VK_T);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
         menuItem.getAccessibleContext().setAccessibleDescription("Set analysis update interval");
         menuItem.addActionListener(this);
@@ -132,7 +129,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         menuBar.add(settings);
 
         // create detector panel
-        detectorPanel = new JPanel();
+        JPanel detectorPanel = new JPanel();
         detectorPanel.setLayout(new BorderLayout());
         detectorView = new CCDetector("LTCC");
         initDetector();
@@ -182,11 +179,13 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     }
 
     public void actionPerformed(ActionEvent e) {
+
         System.out.println(e.getActionCommand());
+
         if ("Set analysis update interval...".equals(e.getActionCommand())) {
             this.chooseUpdateInterval();
         }
-        if (e.getActionCommand() == "Open histograms file...") {
+        if ("Open histograms file...".equals(e.getActionCommand())) {
             String fileName = null;
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -218,7 +217,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
             this.saveHistosToFile(fileName);
         }
-        if ("Load...".equals(e.getActionCommand())) {
+        if ("Load Constants...".equals(e.getActionCommand())) {
             String filePath = null;
             JFileChooser fc = new JFileChooser();
             fc.setDialogTitle("Choose Constants Folder...");
@@ -234,18 +233,23 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.modules.get(k).loadConstants(filePath);
             }
         }
-        if ("Save...".equals(e.getActionCommand())) {
-            DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
+        if ("Save Constants".equals(e.getActionCommand())) {
+            
+            DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
             String dirName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date());
+
             JFileChooser fc = new JFileChooser();
-            File workingDirectory = new File(this.workDir);
-            fc.setCurrentDirectory(workingDirectory);
+
+            //File workingDirectory = new File(this.workDir);
+            // fc.setCurrentDirectory(workingDirectory);
             File file = new File(dirName);
             fc.setSelectedFile(file);
+
             int returnValue = fc.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 dirName = fc.getSelectedFile().getAbsolutePath();
             }
+
             File theDir = new File(dirName);
             // if the directory does not exist, create it
             if (!theDir.exists()) {
@@ -257,11 +261,15 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                     //handle it
                 }
                 if (result) {
-                    System.out.println("Created directory: " + dirName);
+                    System.out.println("Created file: " + dirName);
                 }
             }
+
             for (int k = 0; k < this.modules.size(); k++) {
-                this.modules.get(k).saveConstants(dirName);
+                // how to select a particular module?
+                if ("SPECalibration".equals(this.modules.get(k).getName())) {
+                    this.modules.get(k).saveConstants(dirName);
+                }
             }
         }
     }
@@ -321,16 +329,17 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         if (de != null) {
             this.runNumber = this.getRunNumber(de);
         }
-        if (de.getType() == DataEventType.EVENT_START) {
-            //System.out.println(" EVENT_START");
-        } else if (de.getType() == DataEventType.EVENT_ACCUMULATE) {
-            // System.out.println(" EVENT_ACCUMULATE" + i);
-        } else if (de.getType() == DataEventType.EVENT_SINGLE) {
-            //   System.out.println("EVENT_SINGLE from CalibrationViewer");
-        } else if (de.getType() == DataEventType.EVENT_STOP) {
-            // System.out.println(" EVENT_STOP else");
-            // System.out.println(" Analyzed");
-        }
+
+//        if (de.getType() == DataEventType.EVENT_START) {
+//            //System.out.println(" EVENT_START");
+//        } else if (de.getType() == DataEventType.EVENT_ACCUMULATE) {
+//            // System.out.println(" EVENT_ACCUMULATE" + i);
+//        } else if (de.getType() == DataEventType.EVENT_SINGLE) {
+//            //   System.out.println("EVENT_SINGLE from CalibrationViewer");
+//        } else if (de.getType() == DataEventType.EVENT_STOP) {
+//            // System.out.println(" EVENT_STOP else");
+//            // System.out.println(" Analyzed");
+//        }
         // this should be taken care in each module instead?
         // each modules knows what type of data it needs
         if (de instanceof EvioDataEvent) {
@@ -347,7 +356,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             } else {
                 this.modules.get(k).dataEventAction(hipo);
             }
-            this.modules.get(k).dataEventAction(hipo);
+            //           this.modules.get(k).dataEventAction(hipo);
 
         }
 
@@ -465,4 +474,13 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         return bank.getLong("trigger", 0);
     }
 
+    private JMenuItem createMenuItem(String title, String description, int ke) {
+
+        JMenuItem menuItem = new JMenuItem(title, ke);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(ke, ActionEvent.CTRL_MASK));
+        menuItem.getAccessibleContext().setAccessibleDescription(description);
+        menuItem.addActionListener(this);
+
+        return menuItem;
+    }
 }

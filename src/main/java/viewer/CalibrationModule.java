@@ -180,7 +180,7 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         } else {
             isCooked = true;
         }
-        
+
         if (event.getType() == DataEventType.EVENT_START) {
             System.out.println("Start event in Module Data Event Action" + isCooked);
             resetEventListener();
@@ -304,11 +304,16 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
             BufferedWriter outputBw = new BufferedWriter(outputFw);
 
             for (int i = 0; i < calib.getRowCount(); i++) {
+                
                 String line = new String();
+
+                // for SPE we're only interested in mean and sigma
                 for (int j = 0; j < calib.getColumnCount(); j++) {
-                    line = line + calib.getValueAt(i, j);
-                    if (j < calib.getColumnCount() - 1) {
-                        line = line + " ";
+                    if (j != 4 && j != 6) {
+                        line = line + calib.getValueAt(i, j);
+                        if (j < calib.getColumnCount() - 1) {
+                            line = line + " ";
+                        }
                     }
                 }
                 outputBw.write(line);
@@ -323,7 +328,6 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
             // Or we could just do this: 
             ex.printStackTrace();
         }
-
     }
 
     public void setCanvasUpdate(int time) {
