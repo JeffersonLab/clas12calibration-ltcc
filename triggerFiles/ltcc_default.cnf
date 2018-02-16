@@ -1,11 +1,10 @@
-#
 # LTCC FADC Trigger configuration for PRODUCTION
-# Version 1.0  2/12/18
+# Version 1.2  2/16/18
 # LTCC slots are in EC crates
 #
 # Slot 18 has last 4 channels LTCC and 12 EC
 # Slot 19, 20 are entirely LTCC
-#
+
 
 FADC250_CRATE adcecal2
 FADC250_SLOT 18

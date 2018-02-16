@@ -11,6 +11,7 @@
 ###################################
 
 # Common settings
+# FADC250_W_WIDTH is the time window
 
 FADC250_CRATE all
 FADC250_SLOT	   all
@@ -32,8 +33,6 @@ TDC1190_W_OFFSET -1500
 TDC1190_CRATE end
 
 
-
-
 ###############################################
 # These are the includes from ec and ltcc_calib
 ###############################################
@@ -53,10 +52,9 @@ include trigger/LTCC/ltcc_calib_masks.cnf
 # threshold
 include trigger/LTCC/ltcc_calib_thresholds.cnf
 
-
-############################
-# TS settings (trig1 crate)
-############################
+#############################
+# Trigger supervisor settings
+#############################
 
 TS_CRATE trig1
 

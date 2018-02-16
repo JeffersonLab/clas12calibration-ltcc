@@ -13,10 +13,13 @@ DAQ can be accessed with vnc from clonsl2
 daqvnc
 
 
-DAQ configuration for random trigger:
+DAQ configuration for random trigger
+------------------------------------
 
 Configuration: LTCC
 Config filename: ltcc_calib_random.trg
+
+The "Download" step is the one downloading the actual FADC configuration above
 
 This will produce a file ltcc_calib_random.cnf which includes everything loaded in the trigger. It is also saved in the data.
 
@@ -26,13 +29,15 @@ The file loaded by ltcc_calib_random.trg is ltcc_calib.cnf which in turns loads:
 - masks to ignore EC.......ltcc_calib_masks.cnf
 - thresholds...............ltcc_calib_thresholds.cnf
 
-Masks are ignored in internal pulser mode
+Masks are ignored in internal pulser mode.
+Currently various is removed because it is in ltcc_calib_random.trg
 
 Data
 ----
 
 In: clondaq6
 Directory: /data/stage_in/
+
 
 Checks
 ------
@@ -41,9 +46,9 @@ To check the configuration for a particular slot:
 
 fadc250 adcecal5 mon 18
 
-
-
-
+tcpClient adcecal2 fadc250UploadAllPrint
+tcpClient adcecal2 tdc1190UploadAllPrint
+tcpClient trig1 tsStatus
 
 
 
