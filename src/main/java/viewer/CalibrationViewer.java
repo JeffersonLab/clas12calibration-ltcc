@@ -48,8 +48,7 @@ import org.jlab.detector.decode.CLASDecoder;
  * and open the template in the editor.
  */
 /**
- *
- * @author devita
+ * @author ungaro
  */
 public final class CalibrationViewer implements IDataEventListener, ActionListener, DetectorListener, ChangeListener, EventUtils {
 
@@ -93,44 +92,36 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         // Constants
         JMenu constants = new JMenu("Constants");
-        JMenuItem menuItem = new JMenuItem("Load Constants...", KeyEvent.VK_L);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Load constants from file");
-        menuItem.addActionListener(this);
-        constants.add(menuItem);
-        menuItem = new JMenuItem("Save Constants...", KeyEvent.VK_S);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Save constants to file");
-        menuItem.addActionListener(this);
-        constants.add(menuItem);
+        constants.add(createMenuItem("Load Constants", "Load Constants from file", KeyEvent.VK_L));
+        constants.add(createMenuItem("Save Constants", "Save Constants to file", KeyEvent.VK_S));
         menuBar.add(constants);
 
-        // Histograms
-        JMenu file = new JMenu("Histograms");
-        file.setMnemonic(KeyEvent.VK_A);
-        file.getAccessibleContext().setAccessibleDescription("File options");
-        menuItem = new JMenuItem("Open histograms file...", KeyEvent.VK_O);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
-        menuItem.addActionListener(this);
-        file.add(menuItem);
-        menuItem = new JMenuItem("Print histograms to file...", KeyEvent.VK_P);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Print histograms to file");
-        menuItem.addActionListener(this);
-        file.add(menuItem);
-        menuItem = new JMenuItem("Save histograms...", KeyEvent.VK_H);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
-        menuItem.addActionListener(this);
-        file.add(menuItem);
-        menuBar.add(file);
-
+//        // Histograms
+//        JMenu file = new JMenu("Histograms");
+//        file.setMnemonic(KeyEvent.VK_A);
+//        file.getAccessibleContext().setAccessibleDescription("File options");
+//        menuItem = new JMenuItem("Open histograms file...", KeyEvent.VK_O);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+//        menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
+//        menuItem.addActionListener(this);
+//        file.add(menuItem);
+//        menuItem = new JMenuItem("Print histograms to file...", KeyEvent.VK_P);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+//        menuItem.getAccessibleContext().setAccessibleDescription("Print histograms to file");
+//        menuItem.addActionListener(this);
+//        file.add(menuItem);
+//        menuItem = new JMenuItem("Save histograms...", KeyEvent.VK_H);
+//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+//        menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
+//        menuItem.addActionListener(this);
+//        file.add(menuItem);
+//        
+//        menuBar.add(file);
         // Settings
         JMenu settings = new JMenu("Settings");
         settings.setMnemonic(KeyEvent.VK_A);
         settings.getAccessibleContext().setAccessibleDescription("Choose monitoring parameters");
-        menuItem = new JMenuItem("Set analysis update interval...", KeyEvent.VK_T);
+        JMenuItem menuItem = new JMenuItem("Set analysis update interval...", KeyEvent.VK_T);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
         menuItem.getAccessibleContext().setAccessibleDescription("Set analysis update interval");
         menuItem.addActionListener(this);
@@ -242,7 +233,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.modules.get(k).loadConstants(filePath);
             }
         }
-        if ("Save Constants...".equals(e.getActionCommand())) {
+        if ("Save Constants".equals(e.getActionCommand())) {
+            
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
             String dirName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date());
 
@@ -275,7 +267,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
             for (int k = 0; k < this.modules.size(); k++) {
                 // how to select a particular module?
-                if (this.modules.get(k).getName() == "SPECalibration") {
+                if ("SPECalibration".equals(this.modules.get(k).getName())) {
                     this.modules.get(k).saveConstants(dirName);
                 }
             }
@@ -482,4 +474,13 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         return bank.getLong("trigger", 0);
     }
 
+    private JMenuItem createMenuItem(String title, String description, int ke) {
+
+        JMenuItem menuItem = new JMenuItem(title, ke);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(ke, ActionEvent.CTRL_MASK));
+        menuItem.getAccessibleContext().setAccessibleDescription(description);
+        menuItem.addActionListener(this);
+
+        return menuItem;
+    }
 }
