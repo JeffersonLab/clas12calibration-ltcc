@@ -5,19 +5,7 @@
 # Slot 18 has last 4 channels LTCC and 12 EC
 # Slot 19, 20 are entirely LTCC
 #
-# Masking sectors 1 and 4 entirely
 
-FADC250_CRATE adcecal1
-FADC250_SLOT all
-FADC250_ADC_MASK  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
-FADC250_TRG_MASK  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
-FFADC250_CRATE end
-
-FADC250_CRATE adcecal4
-FADC250_SLOT all
-FADC250_ADC_MASK  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
-FADC250_TRG_MASK  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
-FFADC250_CRATE end
 
 FADC250_CRATE adcecal2
 FADC250_SLOT 3
