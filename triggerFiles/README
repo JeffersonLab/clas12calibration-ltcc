@@ -8,9 +8,14 @@ $CLON_PARMS/trigger/LTCC
 
 To run the LTCC calibration, use the random trigger.
 
+DAQ can be accessed with vnc from clonsl2
+
+daqvnc
+
+
 DAQ configuration for random trigger:
 
-Configuration: PROD_noVTP
+Configuration: LTCC
 Config filename: ltcc_calib_random.trg
 
 This will produce a file ltcc_calib_random.cnf which includes everything loaded in the trigger. It is also saved in the data.
@@ -21,6 +26,13 @@ The file loaded by ltcc_calib_random.trg is ltcc_calib.cnf which in turns loads:
 - masks to ignore EC.......ltcc_calib_masks.cnf
 - thresholds...............ltcc_calib_thresholds.cnf
 
+Masks are ignored in internal pulser mode
+
+Data
+----
+
+In: clondaq6
+Directory: /data/stage_in/
 
 Checks
 ------

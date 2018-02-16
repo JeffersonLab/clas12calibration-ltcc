@@ -25,25 +25,27 @@ FADC250_W_WIDTH	   400
 FADC250_CRATE end
 
 
-
 TDC1190_CRATE all
 TDC1190_SLOT all
-TDC1190_W_WIDTH   800
-TDC1190_W_OFFSET -8450
+TDC1190_W_WIDTH   400
+TDC1190_W_OFFSET -1500
 TDC1190_CRATE end
 
 
 
 
-#######################################################
-#
-#######################################################
+###############################################
+# These are the includes from ec and ltcc_calib
+###############################################
 
 # ECAL settings
 include trigger/EC/ecal_newgain_prod.cnf
 
 # TS, TDC, FADC various:
-include trigger/LTCC/ltcc_calib_various.cnf
+# Various included Trigger supervisor setting,
+# But it was overwriting some values below.
+# Removing it from now
+# include trigger/LTCC/ltcc_calib_various.cnf
 
 # masks :
 include trigger/LTCC/ltcc_calib_masks.cnf

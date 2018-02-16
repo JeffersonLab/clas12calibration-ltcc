@@ -117,6 +117,7 @@ public class LTCCPulses extends CalibrationModule {
                 // System.out.println(" sector " + sector + "   side " + side + " pmt " + pmt + " pedestal " + pedestal);
 
                 for (int i = 0; i < pulse.length; i++) {
+//                    ltccPulse.fill(i, pulse[i]);
                     ltccPulse.fill(i, pulse[i] - pedestal);
                 }
             }
@@ -145,9 +146,9 @@ public class LTCCPulses extends CalibrationModule {
                 System.out.println(" sector " + sector + "   side " + side + " pmt " + paddle + " entries: " + ltccPulse.getEntries() / 100);
 
                 //   every event gives 100 entries 
-                if (ltccPulse.getEntries() > 0) {
-                    normalizedPulse.divide(ltccPulse.getEntries() / 100);
-                }
+//                if (ltccPulse.getEntries() > 0) {
+//                    normalizedPulse.divide(ltccPulse.getEntries() / 100);
+//                }
 
                 this.getCanvas().draw(normalizedPulse);
 

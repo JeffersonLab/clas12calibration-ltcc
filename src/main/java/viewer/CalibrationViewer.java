@@ -351,7 +351,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         }
 
         for (int k = 0; k < this.modules.size(); k++) {
-            if (de instanceof EvioDataEvent) {
+                if ("Mode 1".equals(this.modules.get(k).getName())) {
                 this.modules.get(k).dataEventAction(de);
             } else {
                 this.modules.get(k).dataEventAction(hipo);
