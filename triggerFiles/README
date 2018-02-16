@@ -22,6 +22,9 @@ The file loaded by ltcc_calib_random.trg is ltcc_calib.cnf which in turns loads:
 - thresholds...............ltcc_calib_thresholds.cnf
 
 
+Checks
+------
+
 To check the configuration for a particular slot:
 
 fadc250 adcecal5 mon 18

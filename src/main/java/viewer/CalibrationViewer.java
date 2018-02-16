@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -30,7 +31,6 @@ import modules.Occupancy;
 import modules.LTCCPulses;
 
 import org.jlab.io.base.DataEvent;
-import org.jlab.io.base.DataEventType;
 import org.jlab.io.task.DataSourceProcessorPane;
 import org.jlab.io.task.IDataEventListener;
 import view.DetectorListener;
@@ -61,8 +61,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     JSplitPane splitPanel = null;
 
-    JPanel detectorPanel = null;
-
     CCDetector detectorView = null;
 
     JTabbedPane modulePanel = null;
@@ -75,11 +73,14 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     private int runNumber = 0;
 
-    private final String workDir = "/Users/devita";
+    private final String workDir = ".";
 
     ArrayList<CalibrationModule> modules = new ArrayList();
 
     CLASDecoder clasDecoder = new CLASDecoder();
+
+    // if it's calibration than we do not need to analyse the pulse?
+    JButton isItCalibration;
 
     public CalibrationViewer() {
 
@@ -89,19 +90,22 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         // create menu bar
         menuBar = new JMenuBar();
-        JMenuItem menuItem;
+
+        // Constants
         JMenu constants = new JMenu("Constants");
-        menuItem = new JMenuItem("Load...", KeyEvent.VK_L);
+        JMenuItem menuItem = new JMenuItem("Load Constants...", KeyEvent.VK_L);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
         menuItem.getAccessibleContext().setAccessibleDescription("Load constants from file");
         menuItem.addActionListener(this);
         constants.add(menuItem);
-        menuItem = new JMenuItem("Save...", KeyEvent.VK_S);
+        menuItem = new JMenuItem("Save Constants...", KeyEvent.VK_S);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         menuItem.getAccessibleContext().setAccessibleDescription("Save constants to file");
         menuItem.addActionListener(this);
         constants.add(menuItem);
         menuBar.add(constants);
+
+        // Histograms
         JMenu file = new JMenu("Histograms");
         file.setMnemonic(KeyEvent.VK_A);
         file.getAccessibleContext().setAccessibleDescription("File options");
@@ -121,6 +125,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         menuItem.addActionListener(this);
         file.add(menuItem);
         menuBar.add(file);
+
+        // Settings
         JMenu settings = new JMenu("Settings");
         settings.setMnemonic(KeyEvent.VK_A);
         settings.getAccessibleContext().setAccessibleDescription("Choose monitoring parameters");
@@ -132,7 +138,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         menuBar.add(settings);
 
         // create detector panel
-        detectorPanel = new JPanel();
+        JPanel detectorPanel = new JPanel();
         detectorPanel.setLayout(new BorderLayout());
         detectorView = new CCDetector("LTCC");
         initDetector();
@@ -182,11 +188,13 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     }
 
     public void actionPerformed(ActionEvent e) {
+
         System.out.println(e.getActionCommand());
+
         if ("Set analysis update interval...".equals(e.getActionCommand())) {
             this.chooseUpdateInterval();
         }
-        if (e.getActionCommand() == "Open histograms file...") {
+        if ("Open histograms file...".equals(e.getActionCommand())) {
             String fileName = null;
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -218,7 +226,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
             this.saveHistosToFile(fileName);
         }
-        if ("Load...".equals(e.getActionCommand())) {
+        if ("Load Constants...".equals(e.getActionCommand())) {
             String filePath = null;
             JFileChooser fc = new JFileChooser();
             fc.setDialogTitle("Choose Constants Folder...");
@@ -234,18 +242,22 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.modules.get(k).loadConstants(filePath);
             }
         }
-        if ("Save...".equals(e.getActionCommand())) {
-            DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
+        if ("Save Constants...".equals(e.getActionCommand())) {
+            DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
             String dirName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date());
+
             JFileChooser fc = new JFileChooser();
-            File workingDirectory = new File(this.workDir);
-            fc.setCurrentDirectory(workingDirectory);
+
+            //File workingDirectory = new File(this.workDir);
+            // fc.setCurrentDirectory(workingDirectory);
             File file = new File(dirName);
             fc.setSelectedFile(file);
+
             int returnValue = fc.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 dirName = fc.getSelectedFile().getAbsolutePath();
             }
+
             File theDir = new File(dirName);
             // if the directory does not exist, create it
             if (!theDir.exists()) {
@@ -257,11 +269,15 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                     //handle it
                 }
                 if (result) {
-                    System.out.println("Created directory: " + dirName);
+                    System.out.println("Created file: " + dirName);
                 }
             }
+
             for (int k = 0; k < this.modules.size(); k++) {
-                this.modules.get(k).saveConstants(dirName);
+                // how to select a particular module?
+                if (this.modules.get(k).getName() == "SPECalibration") {
+                    this.modules.get(k).saveConstants(dirName);
+                }
             }
         }
     }
@@ -321,16 +337,17 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         if (de != null) {
             this.runNumber = this.getRunNumber(de);
         }
-        if (de.getType() == DataEventType.EVENT_START) {
-            //System.out.println(" EVENT_START");
-        } else if (de.getType() == DataEventType.EVENT_ACCUMULATE) {
-            // System.out.println(" EVENT_ACCUMULATE" + i);
-        } else if (de.getType() == DataEventType.EVENT_SINGLE) {
-            //   System.out.println("EVENT_SINGLE from CalibrationViewer");
-        } else if (de.getType() == DataEventType.EVENT_STOP) {
-            // System.out.println(" EVENT_STOP else");
-            // System.out.println(" Analyzed");
-        }
+
+//        if (de.getType() == DataEventType.EVENT_START) {
+//            //System.out.println(" EVENT_START");
+//        } else if (de.getType() == DataEventType.EVENT_ACCUMULATE) {
+//            // System.out.println(" EVENT_ACCUMULATE" + i);
+//        } else if (de.getType() == DataEventType.EVENT_SINGLE) {
+//            //   System.out.println("EVENT_SINGLE from CalibrationViewer");
+//        } else if (de.getType() == DataEventType.EVENT_STOP) {
+//            // System.out.println(" EVENT_STOP else");
+//            // System.out.println(" Analyzed");
+//        }
         // this should be taken care in each module instead?
         // each modules knows what type of data it needs
         if (de instanceof EvioDataEvent) {
@@ -347,7 +364,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             } else {
                 this.modules.get(k).dataEventAction(hipo);
             }
-            this.modules.get(k).dataEventAction(hipo);
+            //           this.modules.get(k).dataEventAction(hipo);
 
         }
 

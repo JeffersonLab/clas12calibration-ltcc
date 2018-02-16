@@ -47,8 +47,8 @@ public class CCDetector extends DetectorPane2D {
         
         for(int is=is1; is<=is2; is++) {
             sectors.add(is);
-            for(int ip=0; ip<ccPix.cc_nstr[0] ; ip++) this.getView().addShape("L0", getMirror(is,1,ip));
-            for(int ip=0; ip<ccPix.cc_nstr[1] ; ip++) this.getView().addShape("R0", getMirror(is,2,ip));
+            for(int ip=0; ip<ccPix.cc_nstr[0] ; ip++) this.getView().addShape("Left", getMirror(is,1,ip));
+            for(int ip=0; ip<ccPix.cc_nstr[1] ; ip++) this.getView().addShape("Right", getMirror(is,2,ip));
         }   
                 
         for(String layer : this.getView().getLayerNames()){
