@@ -71,6 +71,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     private int analysisUpdateTime = 50000;
 
     private int runNumber = 0;
+    private int nProcessed = 0;
 
     private final String workDir = ".";
 
@@ -234,7 +235,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
         }
         if ("Save Constants".equals(e.getActionCommand())) {
-            
+
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
             String dirName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date());
 
@@ -323,7 +324,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     @Override
     public void dataEventAction(DataEvent de) {
-
+        nProcessed++;
         HipoDataEvent hipo = null;
 
         if (de != null) {
@@ -351,7 +352,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         }
 
         for (int k = 0; k < this.modules.size(); k++) {
-                if ("Mode 1".equals(this.modules.get(k).getName())) {
+            if ("Mode 1".equals(this.modules.get(k).getName())) {
                 this.modules.get(k).dataEventAction(de);
             } else {
                 this.modules.get(k).dataEventAction(hipo);
@@ -360,8 +361,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         }
 
-        this.detectorView.repaint();
-
+        if(nProcessed % 100 == 0) {
+            this.detectorView.repaint();
+        }
     }
 
     public void loadHistosFromFile(String fileName) {

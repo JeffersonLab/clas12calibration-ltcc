@@ -5,6 +5,10 @@ hostname=$(hostname)
 if [[ $hostname == "clonsl2.jlab.org" ]]; then
 	COATJAVA=/home/clasrun/LTCC/coatjava ; export COATJAVA
 fi
+if [[ $hostname == "MauriMP.local" ]]; then
+	COATJAVA=/opt/project/coatjava ; export COATJAVA
+fi
+
 
 # distribution directory: same as launched
 DISTRO_DIR=`dirname $0`; export DISTRO_DIR
