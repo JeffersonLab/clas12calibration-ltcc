@@ -43,8 +43,9 @@ include trigger/EC/ecal_newgain_prod.cnf
 # TS, TDC, FADC various:
 # Various included Trigger supervisor setting,
 # But it was overwriting some values below.
-# Removing it from now
-# include trigger/LTCC/ltcc_calib_various.cnf
+
+#
+include trigger/LTCC/ltcc_calib_various.cnf
 
 # masks :
 include trigger/LTCC/ltcc_calib_masks.cnf
