@@ -44,7 +44,7 @@ include trigger/EC/ecal_newgain_prod.cnf
 # Various included Trigger supervisor setting,
 # But it was overwriting some values below.
 
-#
+# Time window, Trigger supervisor settings
 include trigger/LTCC/ltcc_calib_various.cnf
 
 # masks :
