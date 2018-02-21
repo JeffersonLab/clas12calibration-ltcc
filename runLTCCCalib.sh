@@ -6,7 +6,7 @@ if [[ $hostname == "clonsl2.jlab.org" ]]; then
 	COATJAVA=/home/clasrun/LTCC/coatjava ; export COATJAVA
 fi
 if [[ $hostname == "MauriMP.local" ]]; then
-	COATJAVA=/opt/project/coatjava ; export COATJAVA
+	COATJAVA=/opt/projects/coatjava ; export COATJAVA
 fi
 
 

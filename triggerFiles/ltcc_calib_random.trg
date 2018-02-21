@@ -21,8 +21,6 @@ FADC250_NSA         60
 FADC250_NPEAK        1
 FADC250_DAC       3300
 FADC250_TET        400
-FADC250_W_OFFSET  7650
-FADC250_W_WIDTH	   400
 FADC250_CRATE end
 
 
@@ -41,8 +39,9 @@ TDC1190_CRATE end
 include trigger/EC/ecal_newgain_prod.cnf
 
 # TS, TDC, FADC various:
-# Various included Trigger supervisor setting,
-# But it was overwriting some values below.
+# Various included Trigger supervisor setting and
+# Time window. It was overwriting some values from this file.
+# Keeping this file TS settings
 
 # Time window, Trigger supervisor settings
 include trigger/LTCC/ltcc_calib_various.cnf
@@ -72,13 +71,11 @@ TS_HOLDOFF   3 15 1
 TS_HOLDOFF   4 10 1
 
 
-#
 # TS GTP trigger mask - disabled
-#
 TS_GTP_INPUT_MASK 0x00000000
 
 
-#
+
 # TS FP trigger mask
 #
 # 0x40 - LTCC
