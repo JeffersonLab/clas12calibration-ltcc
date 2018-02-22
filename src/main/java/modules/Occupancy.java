@@ -6,20 +6,14 @@
 package modules;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.List;
 import view.DetectorShape2D;
 import viewer.CalibrationModule;
 import viewer.CCDetector;
-import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.groot.base.ColorPalette;
-import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
-import org.jlab.groot.math.F1D;
-import org.jlab.groot.fitter.DataFitter;
 import org.jlab.utils.groups.IndexedList;
 
 /**
