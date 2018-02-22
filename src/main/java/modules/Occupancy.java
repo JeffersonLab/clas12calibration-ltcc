@@ -40,7 +40,7 @@ public class Occupancy extends CalibrationModule {
 
         for (int iSect : this.getDetector().getSectors()) {
             // initialize data group
-            H2F chanADC = new H2F("chanADC_", 60, 100.0, 3000.0, 18, 0.5, 36.5);
+            H2F chanADC = new H2F("chanADC_", 200, 10.0, 2010.0, 36, 0.5, 36.5);
             chanADC.setTitleX("Sector" + "_" + iSect + " " + "ADC");
             chanADC.setTitleY("Sector" + "_" + iSect + " " + "channel");
 
