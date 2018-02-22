@@ -42,11 +42,6 @@ import org.jlab.io.evio.EvioDataEvent;
 import org.jlab.io.hipo.HipoDataEvent;
 import org.jlab.detector.decode.CLASDecoder;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
  * @author ungaro
  */
@@ -70,6 +65,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     private int analysisUpdateTime = 50000;
 
+    private boolean mode1Active = false;
+
     private int runNumber = 0;
     private int nProcessed = 0;
 
@@ -92,42 +89,16 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         menuBar = new JMenuBar();
 
         // Constants
-        JMenu constants = new JMenu("Constants");
-        constants.add(createMenuItem("Load Constants", "Load Constants from file", KeyEvent.VK_L));
-        constants.add(createMenuItem("Save Constants", "Save Constants to file", KeyEvent.VK_S));
-        menuBar.add(constants);
+        JMenu constantsMenu = new JMenu("Constants");
+        constantsMenu.add(createMenuItem("Load Constants", "Load Constants from file", KeyEvent.VK_L));
+        constantsMenu.add(createMenuItem("Save Constants", "Save Constants to file", KeyEvent.VK_S));
+        menuBar.add(constantsMenu);
 
-//        // Histograms
-//        JMenu file = new JMenu("Histograms");
-//        file.setMnemonic(KeyEvent.VK_A);
-//        file.getAccessibleContext().setAccessibleDescription("File options");
-//        menuItem = new JMenuItem("Open histograms file...", KeyEvent.VK_O);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-//        menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
-//        menuItem.addActionListener(this);
-//        file.add(menuItem);
-//        menuItem = new JMenuItem("Print histograms to file...", KeyEvent.VK_P);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-//        menuItem.getAccessibleContext().setAccessibleDescription("Print histograms to file");
-//        menuItem.addActionListener(this);
-//        file.add(menuItem);
-//        menuItem = new JMenuItem("Save histograms...", KeyEvent.VK_H);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
-//        menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
-//        menuItem.addActionListener(this);
-//        file.add(menuItem);
-//        
-//        menuBar.add(file);
         // Settings
-        JMenu settings = new JMenu("Settings");
-        settings.setMnemonic(KeyEvent.VK_A);
-        settings.getAccessibleContext().setAccessibleDescription("Choose monitoring parameters");
-        JMenuItem menuItem = new JMenuItem("Set analysis update interval...", KeyEvent.VK_T);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Set analysis update interval");
-        menuItem.addActionListener(this);
-        settings.add(menuItem);
-        menuBar.add(settings);
+        JMenu settingsMenu = new JMenu("Settings");
+        constantsMenu.add(createMenuItem("Set analysis update interval", "Set analysis update interval", KeyEvent.VK_T));
+        constantsMenu.add(createMenuItem("Switch Mode 1", "Activate/Disactive Mode 1 histos", KeyEvent.VK_M));
+        menuBar.add(constantsMenu);
 
         // create detector panel
         JPanel detectorPanel = new JPanel();
@@ -181,9 +152,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     public void actionPerformed(ActionEvent e) {
 
-        System.out.println(e.getActionCommand());
+       // System.out.println(e.getActionCommand());
 
-        if ("Set analysis update interval...".equals(e.getActionCommand())) {
+        if ("Set analysis update interval".equals(e.getActionCommand())) {
             this.chooseUpdateInterval();
         }
         if ("Open histograms file...".equals(e.getActionCommand())) {
@@ -202,6 +173,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         }
         if ("Print histograms to file...".equals(e.getActionCommand())) {
             this.printHistosToFile();
+        }
+
+        if ("Switch Mode 1".equals(e.getActionCommand())) {
+            mode1Active = !mode1Active;
+            System.out.println("Mode 1: " + mode1Active);
         }
 
         if ("Save histograms...".equals(e.getActionCommand())) {
@@ -353,7 +329,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         for (int k = 0; k < this.modules.size(); k++) {
             if ("Mode 1".equals(this.modules.get(k).getName())) {
-                this.modules.get(k).dataEventAction(de);
+                if (mode1Active) {
+                    this.modules.get(k).dataEventAction(de);
+                }
             } else {
                 this.modules.get(k).dataEventAction(hipo);
             }
@@ -361,7 +339,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         }
 
-        if(nProcessed % 100 == 0) {
+        if (nProcessed % 100 == 0) {
             this.detectorView.repaint();
         }
     }
