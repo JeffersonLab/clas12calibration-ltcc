@@ -189,7 +189,7 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
             processEvent(event);
         } else if (event.getType() == DataEventType.EVENT_SINGLE) {
             processEvent(event);
-            System.out.println("EVENT_SINGLE from FTCalibrationModule");
+            System.out.println("EVENT_SINGLE from LTCCCalibrationModule");
         } else if (event.getType() == DataEventType.EVENT_STOP) {
             System.out.println("EVENT_STOP");
             analyze();

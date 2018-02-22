@@ -62,8 +62,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     String moduleSelect = null;
 
     private int canvasUpdateTime = 4000;
-
-    private int analysisUpdateTime = 50000;
+    private int analysisUpdateTime = 5000;
 
     private boolean mode1Active = false;
 
@@ -96,9 +95,9 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         // Settings
         JMenu settingsMenu = new JMenu("Settings");
-        constantsMenu.add(createMenuItem("Set analysis update interval", "Set analysis update interval", KeyEvent.VK_T));
-        constantsMenu.add(createMenuItem("Switch Mode 1", "Activate/Disactive Mode 1 histos", KeyEvent.VK_M));
-        menuBar.add(constantsMenu);
+        settingsMenu.add(createMenuItem("Set analysis update interval", "Set analysis update interval", KeyEvent.VK_T));
+        settingsMenu.add(createMenuItem("Switch Mode 1", "Activate/Disactive Mode 1 histos", KeyEvent.VK_M));
+        menuBar.add(settingsMenu);
 
         // create detector panel
         JPanel detectorPanel = new JPanel();
@@ -381,10 +380,10 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     public void timerUpdate() {
         this.detectorView.repaint();
+        
         for (int k = 0; k < this.modules.size(); k++) {
             this.modules.get(k).timerUpdate();
         }
-
     }
 
     public void resetEventListener() {
