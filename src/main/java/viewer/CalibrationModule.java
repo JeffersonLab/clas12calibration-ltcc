@@ -18,14 +18,17 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JSplitPane;
 import view.DetectorShape2D;
+
 import org.jlab.detector.calib.tasks.CalibrationEngine;
 import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.detector.calib.utils.CalibrationConstantsListener;
 import org.jlab.detector.calib.utils.CalibrationConstantsView;
 import org.jlab.detector.calib.utils.ConstantsManager;
+
 import org.jlab.groot.data.IDataSet;
 import org.jlab.groot.data.TDirectory;
 import org.jlab.groot.group.DataGroup;
+
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataEventType;
 import org.jlab.utils.groups.IndexedList;
@@ -34,7 +37,7 @@ import org.jlab.io.evio.EvioDataEvent;
 
 /**
  *
- * @author devita
+ * @author ungaro
  */
 public class CalibrationModule extends CalibrationEngine implements CalibrationConstantsListener {
 
@@ -44,7 +47,9 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
 
     private CalibrationConstants calib = null;
     private CalibrationConstants prevCalib = null;
-    private final IndexedList<DataGroup> dataGroups = new IndexedList<DataGroup>(3);
+    
+    private final IndexedList<DataGroup> dataGroups = new IndexedList<>(3);
+    
     private JSplitPane moduleView = null;
     private EmbeddedCanvas canvas = null;
     private CalibrationConstantsView ccview = null;

@@ -1,7 +1,6 @@
 package modules;
 
 import org.jlab.groot.math.Func1D;
-import static org.apache.commons.math3.special.Gamma.gamma;
 import org.jlab.groot.math.UserParameter;
 
 public class expo extends Func1D {

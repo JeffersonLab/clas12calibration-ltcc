@@ -101,7 +101,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         menuBar.add(settingsMenu);
 
         // Save Data Group
-        JMenu dataGroupIO = new JMenu("dataGroupIO");
+        JMenu dataGroupIO = new JMenu("DataGroupIO");
         dataGroupIO.add(createMenuItem("Save Datagroup", "Save all datagroup objects like histos, etc", KeyEvent.VK_D));
         dataGroupIO.add(createMenuItem("Load Datagroup", "Load all datagroup objects like histos, etc", KeyEvent.VK_R));
         menuBar.add(dataGroupIO);
@@ -156,6 +156,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         this.setCanvasUpdate(canvasUpdateTime);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         // System.out.println(e.getActionCommand());
@@ -203,9 +204,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
         }
 
-        if ("Print histograms to file...".equals(e.getActionCommand())) {
-            this.printHistosToFile();
-        }
+
 
         if ("Load Constants...".equals(e.getActionCommand())) {
             String filePath = null;
@@ -223,6 +222,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.modules.get(k).loadConstants(filePath);
             }
         }
+        
         if ("Save Constants".equals(e.getActionCommand())) {
 
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
@@ -378,26 +378,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         }
     }
 
-    public void printHistosToFile() {
-        DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
-        String data = this.workDir + "/kpp-pictures/clas12rec_run_" + this.runNumber + "_" + df.format(new Date());
-        File theDir = new File(data);
-        // if the directory does not exist, create it
-        if (!theDir.exists()) {
-            boolean result = false;
-            try {
-                theDir.mkdir();
-                result = true;
-            } catch (SecurityException se) {
-                //handle it
-            }
-            if (result) {
-                System.out.println("Created directory: " + data);
-            }
-        }
-        String fileName = data + "/clas12_canvas.png";
-        System.out.println(fileName);
-    }
 
     public void timerUpdate() {
         this.detectorView.repaint();
