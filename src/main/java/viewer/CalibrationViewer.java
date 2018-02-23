@@ -62,11 +62,12 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     String moduleSelect = null;
 
     private int canvasUpdateTime = 4000;
+
     private int analysisUpdateTime = 5000;
 
     private boolean mode1Active = false;
 
-    private int runNumber = 0;
+    private int runNumber = -1;
     private int nProcessed = 0;
 
     private final String workDir = ".";
@@ -98,6 +99,12 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         settingsMenu.add(createMenuItem("Set analysis update interval", "Set analysis update interval", KeyEvent.VK_T));
         settingsMenu.add(createMenuItem("Switch Mode 1", "Activate/Disactive Mode 1 histos", KeyEvent.VK_M));
         menuBar.add(settingsMenu);
+
+        // Save Data Group
+        JMenu dataGroupIO = new JMenu("dataGroupIO");
+        dataGroupIO.add(createMenuItem("Save Datagroup", "Save all datagroup objects like histos, etc", KeyEvent.VK_D));
+        dataGroupIO.add(createMenuItem("Load Datagroup", "Load all datagroup objects like histos, etc", KeyEvent.VK_R));
+        menuBar.add(dataGroupIO);
 
         // create detector panel
         JPanel detectorPanel = new JPanel();
@@ -151,12 +158,37 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     public void actionPerformed(ActionEvent e) {
 
-       // System.out.println(e.getActionCommand());
-
+        // System.out.println(e.getActionCommand());
         if ("Set analysis update interval".equals(e.getActionCommand())) {
             this.chooseUpdateInterval();
         }
-        if ("Open histograms file...".equals(e.getActionCommand())) {
+
+        if ("Switch Mode 1".equals(e.getActionCommand())) {
+            mode1Active = !mode1Active;
+            System.out.println("Mode 1: " + mode1Active);
+        }
+
+        if ("Save Datagroup".equals(e.getActionCommand())) {
+            DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+            
+            String fileName = "LTCCCalib-Run." + this.runNumber + "." + df.format(new Date()) + ".hipo";
+            JFileChooser fc = new JFileChooser();
+            
+            File workingDirectory = new File(this.workDir + "/LTCCCalib-histos");
+            fc.setCurrentDirectory(workingDirectory);
+            
+            File file = new File(fileName);
+            fc.setSelectedFile(file);
+            
+            int returnValue = fc.showSaveDialog(null);
+            
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                fileName = fc.getSelectedFile().getAbsolutePath();
+            }
+            this.saveHistosToFile(fileName);
+        }
+
+        if ("Load Datagroup".equals(e.getActionCommand())) {
             String fileName = null;
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -170,29 +202,11 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                 this.loadHistosFromFile(fileName);
             }
         }
+
         if ("Print histograms to file...".equals(e.getActionCommand())) {
             this.printHistosToFile();
         }
 
-        if ("Switch Mode 1".equals(e.getActionCommand())) {
-            mode1Active = !mode1Active;
-            System.out.println("Mode 1: " + mode1Active);
-        }
-
-        if ("Save histograms...".equals(e.getActionCommand())) {
-            DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
-            String fileName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date()) + ".hipo";
-            JFileChooser fc = new JFileChooser();
-            File workingDirectory = new File(this.workDir + "/LTCCCalib-histos");
-            fc.setCurrentDirectory(workingDirectory);
-            File file = new File(fileName);
-            fc.setSelectedFile(file);
-            int returnValue = fc.showSaveDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                fileName = fc.getSelectedFile().getAbsolutePath();
-            }
-            this.saveHistosToFile(fileName);
-        }
         if ("Load Constants...".equals(e.getActionCommand())) {
             String filePath = null;
             JFileChooser fc = new JFileChooser();
@@ -212,7 +226,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         if ("Save Constants".equals(e.getActionCommand())) {
 
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-            String dirName = "LTCCCalib_" + this.runNumber + "_" + df.format(new Date());
+            String dirName = "LTCCCalib-" + this.runNumber + "_" + df.format(new Date());
 
             JFileChooser fc = new JFileChooser();
 
@@ -275,13 +289,16 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     }
 
     private int getRunNumber(DataEvent event) {
+
         int rNum = this.runNumber;
+
         DataBank bank = null;
         if (event.hasBank("RUN::config")) {
             bank = event.getBank("RUN::config");
-        }
-        if (bank != null) {
-            rNum = bank.getInt("run", 0);
+
+            if (bank != null) {
+                rNum = bank.getInt("run", 0);
+            }
         }
         return rNum;
     }
@@ -301,10 +318,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
     public void dataEventAction(DataEvent de) {
         nProcessed++;
         HipoDataEvent hipo = null;
-
-        if (de != null) {
-            this.runNumber = this.getRunNumber(de);
-        }
 
 //        if (de.getType() == DataEventType.EVENT_START) {
 //            //System.out.println(" EVENT_START");
@@ -341,6 +354,14 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         if (nProcessed % 100 == 0) {
             this.detectorView.repaint();
         }
+
+        if (runNumber == -1 && hipo == null) {
+            runNumber = this.getRunNumber(de);
+        } else {
+            runNumber = this.getRunNumber(hipo);
+        }
+        
+        
     }
 
     public void loadHistosFromFile(String fileName) {
@@ -380,7 +401,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
     public void timerUpdate() {
         this.detectorView.repaint();
-        
+
         for (int k = 0; k < this.modules.size(); k++) {
             this.modules.get(k).timerUpdate();
         }

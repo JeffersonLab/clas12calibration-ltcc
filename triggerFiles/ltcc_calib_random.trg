@@ -58,9 +58,8 @@ include trigger/LTCC/ltcc_calib_thresholds.cnf
 
 TS_CRATE trig1
 
-#lock-roc mode
-#TS_BLOCK_LEVEL   1
-#TS_BUFFER_LEVEL  1
+# TS_BLOCK_LEVEL: read N event at a time
+# TS_BUFFER_LEVEL: write N event at a time?
 
 # production: 5 5 15 10
 TS_BLOCK_LEVEL   20
