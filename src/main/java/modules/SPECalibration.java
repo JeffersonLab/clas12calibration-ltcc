@@ -175,7 +175,8 @@ public class SPECalibration extends CalibrationModule {
         getCalibrationTable().fireTableDataChanged();
     }
 
-    // decide what's get plotted in the canvas
+    // decide what's get plotted in the canvas at the button click
+    
     @Override
     public void processShape(DetectorShape2D dsd) {
 
@@ -206,9 +207,7 @@ public class SPECalibration extends CalibrationModule {
             } else {
                 System.out.println(" ERROR: can not find the data group for sector " + sector);
             }
-
         }
-
     }
 
     @Override
