@@ -23,7 +23,7 @@ import org.jlab.groot.fitter.DataFitter;
 // for mode help on groot:
 // https://github.com/gavalian/groot
 /**
- * @author burcu
+ * @author ungaro
  */
 public class SPECalibration extends CalibrationModule {
 
@@ -151,15 +151,14 @@ public class SPECalibration extends CalibrationModule {
                     F1D gaussianFit = this.getDataGroup().getItem(iSect, iSide, iComp).getF1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp);
                     this.initTimeGaussFitPar(gaussianFit, speADC);
 
-
                     // only fit if there are 100 events or more
                     int minEntries = 0;
-                    for(int b=0; b<50; b++) {
+                    for (int b = 0; b < 50; b++) {
                         minEntries += speADC.getBinContent(b);
                     }
 
-                                    System.out.println(minEntries);
-                    
+                    System.out.println(minEntries);
+
                     if (minEntries > 100) {
                         DataFitter.fit(gaussianFit, speADC, "LQ");
                         updateCalibration(iSect, iSide, iComp);
@@ -186,7 +185,7 @@ public class SPECalibration extends CalibrationModule {
         getCalibrationTable().fireTableDataChanged();
     }
 
-    // decide what's get plotted in the canvas
+    // decide what's get plotted in the canvas at the button click
     @Override
     public void processShape(DetectorShape2D dsd) {
 
@@ -217,7 +216,6 @@ public class SPECalibration extends CalibrationModule {
             } else {
                 System.out.println(" ERROR: can not find the data group for sector " + sector);
             }
-
         }
         analyze();
     }

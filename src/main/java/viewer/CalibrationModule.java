@@ -36,7 +36,6 @@ import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.io.evio.EvioDataEvent;
 
 /**
- *
  * @author ungaro
  */
 public class CalibrationModule extends CalibrationEngine implements CalibrationConstantsListener {
