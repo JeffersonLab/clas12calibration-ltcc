@@ -45,12 +45,12 @@ public class SPECalibration extends CalibrationModule {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
 
                     // initialize calibration table
-                   // if (iSect != 4) {
-                        getCalibrationTable().addEntry(iSect, iSide, iComp);
-                        getCalibrationTable().setDoubleValue(200.0, "mean", iSect, iSide, iComp);
-                        getCalibrationTable().setDoubleValue(10.0, "mean_e", iSect, iSide, iComp);
-                        getCalibrationTable().setDoubleValue(20.0, "sigma", iSect, iSide, iComp);
-                        getCalibrationTable().setDoubleValue(2.0, "sigma_e", iSect, iSide, iComp);
+                    // if (iSect != 4) {
+                    getCalibrationTable().addEntry(iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(200.0, "mean", iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(10.0, "mean_e", iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(20.0, "sigma", iSect, iSide, iComp);
+                    getCalibrationTable().setDoubleValue(2.0, "sigma_e", iSect, iSide, iComp);
                     // }
                     // initialize data group
                     H1F speADC = new H1F("speADC_" + iSect + "_" + iSide + "_" + iComp, 200, 0.0, 1000.0);
@@ -115,7 +115,7 @@ public class SPECalibration extends CalibrationModule {
         //       long triggerWord = triggerBank.getLong("trigger", 11);
         // System.out.println("trigger word: " + triggerWord);
         // System.out.println(nEventsProcessed);
-        if(isCooked) {
+        if (isCooked) {
 
             if (event.hasBank("LTCC::adc")) {
                 DataBank bank = event.getBank("LTCC::adc");
@@ -138,6 +138,7 @@ public class SPECalibration extends CalibrationModule {
         }
     }
 
+    @Override
     public void analyze() {
 //        System.out.println("Analyzing");
 
@@ -150,9 +151,19 @@ public class SPECalibration extends CalibrationModule {
                     F1D gaussianFit = this.getDataGroup().getItem(iSect, iSide, iComp).getF1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp);
                     this.initTimeGaussFitPar(gaussianFit, speADC);
 
-                    DataFitter.fit(gaussianFit, speADC, "LQ");
 
-                    updateCalibration(iSect, iSide, iComp);
+                    // only fit if there are 100 events or more
+                    int minEntries = 0;
+                    for(int b=0; b<50; b++) {
+                        minEntries += speADC.getBinContent(b);
+                    }
+
+                                    System.out.println(minEntries);
+                    
+                    if (minEntries > 100) {
+                        DataFitter.fit(gaussianFit, speADC, "LQ");
+                        updateCalibration(iSect, iSide, iComp);
+                    }
 
 //                    poissonExpo poissonExpoFitF = new poissonExpo("fADC_" + iSect + "_" + iSide + "_" + iComp, 10, 500);
 //                    initPoissonExpoPars(poissonExpoFitF, speADC);
@@ -208,7 +219,7 @@ public class SPECalibration extends CalibrationModule {
             }
 
         }
-
+        analyze();
     }
 
     @Override
@@ -297,6 +308,7 @@ public class SPECalibration extends CalibrationModule {
     }
 
     private void initTimeGaussFitPar(F1D function, H1F histo) {
+
         double hAmp = histo.getBinContent(histo.getMaximumBin());
         double hMean = histo.getAxis().getBinCenter(histo.getMaximumBin());
 
@@ -343,7 +355,7 @@ public class SPECalibration extends CalibrationModule {
             getCalibrationTable().setDoubleValue(sigma_e, "sigma_e", sector, side, paddle);
         }
     }
-    
+
 //       @Override
 //    public void  saveConstants(String filename) {
 //        

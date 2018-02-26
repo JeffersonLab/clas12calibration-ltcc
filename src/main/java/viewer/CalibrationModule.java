@@ -344,6 +344,7 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         dir.mkdir(folder);
         dir.cd(folder);
         Map<Long, DataGroup> map = this.getDataGroup().getMap();
+        
         for (Map.Entry<Long, DataGroup> entry : map.entrySet()) {
             DataGroup group = entry.getValue();
             int nrows = group.getRows();

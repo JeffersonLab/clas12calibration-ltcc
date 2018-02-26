@@ -171,18 +171,18 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         if ("Save Datagroup".equals(e.getActionCommand())) {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-            
+
             String fileName = "LTCCCalib-Run." + this.runNumber + "." + df.format(new Date()) + ".hipo";
             JFileChooser fc = new JFileChooser();
-            
+
             File workingDirectory = new File(this.workDir + "/LTCCCalib-histos");
             fc.setCurrentDirectory(workingDirectory);
-            
+
             File file = new File(fileName);
             fc.setSelectedFile(file);
-            
+
             int returnValue = fc.showSaveDialog(null);
-            
+
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 fileName = fc.getSelectedFile().getAbsolutePath();
             }
@@ -204,8 +204,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
         }
 
-
-
         if ("Load Constants...".equals(e.getActionCommand())) {
             String filePath = null;
             JFileChooser fc = new JFileChooser();
@@ -220,9 +218,12 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             }
             for (int k = 0; k < this.modules.size(); k++) {
                 this.modules.get(k).loadConstants(filePath);
+
+            //    this.modules.get(k).analyze();
+
             }
         }
-        
+
         if ("Save Constants".equals(e.getActionCommand())) {
 
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
@@ -360,8 +361,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         } else {
             runNumber = this.getRunNumber(hipo);
         }
-        
-        
+
     }
 
     public void loadHistosFromFile(String fileName) {
@@ -377,7 +377,6 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
             this.modules.get(k).readDataGroup(dir);
         }
     }
-
 
     public void timerUpdate() {
         this.detectorView.repaint();
