@@ -157,16 +157,15 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         this.moduleName = name;
         this.nProcessed = 0;
         // create calibration constants viewer
-        ccview = new CalibrationConstantsView();
         
         this.calib = new CalibrationConstants(3, Constants);
         this.calib.setName(name);
         this.calib.setPrecision(2);
         
         
-        this.prevCalib = new CalibrationConstants(3, Constants);
-        this.prevCalib.setName(name);
-        this.prevCalib.setPrecision(2);
+        
+        
+        ccview = new CalibrationConstantsView();
         ccview.addConstants(this.getCalibrationConstants().get(0), this);
 
         moduleView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
