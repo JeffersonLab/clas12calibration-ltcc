@@ -3,7 +3,6 @@ package modules;
 import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.group.DataGroup;
-import org.jlab.groot.math.F1D;
 import org.jlab.utils.groups.IndexedList;
 
 public class CalibrationRun {
@@ -44,7 +43,6 @@ public class CalibrationRun {
         speCalib = new CalibrationConstants(3, "mean:mean_e:sigma:sigma_e:ped:tet");
         speCalib.setName("LTCC SPE Calibration");
         speCalib.setPrecision(2);
-        // initialize constants from CCDB
 
         System.out.println("Initializing CCDB Database: Timing");
         timingCalib = new CalibrationConstants(3, "mean:mean_e:sigma:sigma_e:ped:tet");
@@ -56,6 +54,14 @@ public class CalibrationRun {
             for (int d = 0; d < NSIDES; d++) {
                 for (int p = 0; p < NSEGMENTS; p++) {
 
+                    // initialize constants 
+                    speCalib.addEntry(s, d, p);
+                    speCalib.setDoubleValue(200.0, "mean", s, d, p);
+                    speCalib.setDoubleValue(10.0, "mean_e", s, d, p);
+                    speCalib.setDoubleValue(20.0, "sigma", s, d, p);
+                    speCalib.setDoubleValue(2.0, "sigma_e", s, d, p);
+
+                    // initialize histos
                     H1F allFadc = new H1F(nameForObject(FADC_ALLNAME, s, d, p), 200, 0.0, 1000.0);
                     H1F eleFadc = new H1F(nameForObject(FADC_ELENAME, s, d, p), 200, 0.0, 4000.0);
                     H1F pioFadc = new H1F(nameForObject(FADC_PIONAME, s, d, p), 200, 0.0, 4000.0);
@@ -74,20 +80,22 @@ public class CalibrationRun {
                     rndFadc.setTitleY("Counts");
                     rndFadc.setTitle(titleForObject("rnd trigger ADC", s, d, p));
 
-                  
-//                    DataGroup dg = new DataGroup(6, 3);
-//                    dg.addDataSet(speADC, 0);
-//                    dg.addDataSet(fitpars, 0);   // added fit parameters histo to the datagroup
-//                    dg.addDataSet(fitparsDB, 0);   // added hist containing fit parameters from DB to the datagroup
-//                    dg.addDataSet(gaussianFit, 0);   // added gaussian fit function
-//
-//                    this.getDataGroup().add(dg, iSect, iSide, iComp);
+                    // one datagroup / pmt
+                    // why the dimensions?
+                    DataGroup thisDataGroup = new DataGroup(6, 3);
+                    thisDataGroup.addDataSet(allFadc, 0);
+                    thisDataGroup.addDataSet(eleFadc, 0);
+                    thisDataGroup.addDataSet(pioFadc, 0);
+                    thisDataGroup.addDataSet(rndFadc, 0);
+
+                    dataGroups.add(thisDataGroup, s, d, p);
 
                 }
             }
         }
-
     }
+    
+    
 
     // naming convention
     private String nameForObject(String baseName, int sector, int side, int segment) {
@@ -103,4 +111,3 @@ public class CalibrationRun {
     }
 
 }
-
