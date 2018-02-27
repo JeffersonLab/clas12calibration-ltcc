@@ -42,13 +42,32 @@ public class CalibrationRun {
         speCalib = new CalibrationConstants(3, "mean:mean_e:sigma:sigma_e:ped:tet");
         speCalib.setName("LTCC SPE Calibration");
         speCalib.setPrecision(2);
-// initialize constants from CCDB if 
+        // initialize constants from CCDB
 
-        System.out.println("Initializing CCDB Database: SPE");
+        System.out.println("Initializing CCDB Database: Timing");
         timingCalib = new CalibrationConstants(3, "mean:mean_e:sigma:sigma_e:ped:tet");
         timingCalib.setName("LTCC Timing Calibration");
         timingCalib.setPrecision(2);
 
+        // histos
+        for (int s = 0; s < NSECTORS; s++) {
+            for (int d = 0; d < NSIDES; d++) {
+                for (int p = 0; p < NSEGMENTS; p++) {
+
+                }
+            }
+        }
+
+    }
+
+    
+    // naming convention
+    private String nameForObject(String baseName, int sector, int side, int segment) {
+        return baseName + "_S" + (sector + 1) + "_L" + (side + 1) + "_P" + (segment + 1);
+    }
+
+    private String titleForObject(String baseName, int sector, int side, int segment) {
+        return baseName + "S:" + (sector + 1) + " Side: " + (side + 1) + " P: " + (segment + 1);
     }
 
 }
