@@ -7,9 +7,8 @@ package viewer;
 
 /**
  *
- * @author devita
+ * @author ungaro
  */
-//import org.clas.fcmon.tools.FCDetector;
 import java.util.ArrayList;
 import java.util.List;
 import view.DetectorPane2D;
