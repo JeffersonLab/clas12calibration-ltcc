@@ -29,6 +29,7 @@ import modules.SPESummary;
 import modules.EventUtils;
 import modules.Occupancy;
 import modules.LTCCPulses;
+import modules.SPEModule;
 
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.task.DataSourceProcessorPane;
@@ -113,6 +114,8 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         initDetector();
         detectorPanel.add(detectorView);
 
+        
+        // adding various modules
         SPECalibration speC = new SPECalibration(detectorView, "SPECalibration");
         SPESummary speS = new SPESummary(detectorView, "SPESummary");
         speS.setCalibrationTable(speC.getCalibrationTable());
@@ -121,12 +124,15 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
 
+        SPEModule speModule = new SPEModule(detectorView, "SPEModule");
+        
         // create module viewer: each of these is on one tab
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
         modules.add(speC);
         modules.add(speS);
         modules.add(pmtOccupancy);
         modules.add(ltccPulses);
+        modules.add(speModule);
 
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
