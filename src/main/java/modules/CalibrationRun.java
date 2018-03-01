@@ -7,6 +7,12 @@ import org.jlab.utils.groups.IndexedList;
 
 public class CalibrationRun {
 
+    // geometry, available sectors, naming conventions for histos
+    private static final int NSECTORS = 6;
+    private static final int NSIDES = 2;
+    private static final int NSEGMENTS = 18;
+    private static final int[] ACTIVESECTORS = {0, 1, 1, 0, 1, 1};
+
     // calibration constants from DB
     private CalibrationConstants speCalib = null;
     private CalibrationConstants timingCalib = null;
@@ -15,24 +21,22 @@ public class CalibrationRun {
     // histograms are saved in datagroups
     private final IndexedList<DataGroup> dataGroups = new IndexedList<>(3);
 
-    // geometry, available sectors, naming conventions for histos
-    private static final int NSECTORS = 6;
-    private static final int NSIDES = 2;
-    private static final int NSEGMENTS = 18;
-    private static final int[] ACTIVESECTORS = {0, 1, 1, 0, 1, 1};
-
-    // histos
+    // histos naming conventions
     private static final String FADC_ALLNAME = "allFadc";
+    private static final String FADC_RNDNAME = "rndFadc";
     private static final String FADC_ELENAME = "eleFadc";
     private static final String FADC_PIONAME = "pioFadc";
-    private static final String FADC_RNDNAME = "rndFadc";
+    private static final String[] speHistoNames = {FADC_ALLNAME, FADC_RNDNAME, FADC_ELENAME, FADC_PIONAME};
+    private static final int[] speHistoXMax = {1000, 1000, 4000, 4000};
 
-    // histo storing the fit parameters
-    private static final String FITPARS_HNAME = "fitpars";
+    // histo vectors
+    private IndexedList<H1F> speHistos = new IndexedList<>(4);
 
-    // fit functions
-    private static final String GAUSF_HNAME = "gaussFitFunction";
-
+//    // histo storing the fit parameters
+//    private static final String FITPARS_HNAME = "fitpars";
+//
+//    // fit functions
+//    private static final String GAUSF_HNAME = "gaussFitFunction";
     public CalibrationRun(int runNo) {
 
         runNumber = runNo;
@@ -61,6 +65,10 @@ public class CalibrationRun {
                     speCalib.setDoubleValue(20.0, "sigma", s, d, p);
                     speCalib.setDoubleValue(2.0, "sigma_e", s, d, p);
 
+                    for (int h = 0; h < speHistoNames.length; h++) {
+                        speHistos.add(new H1F(speHistoNames[h], 200, 0.0, 1000.0), s, d, p );
+                    }
+                    
                     // initialize histos
                     H1F allFadc = new H1F(nameForObject(FADC_ALLNAME, s, d, p), 200, 0.0, 1000.0);
                     H1F eleFadc = new H1F(nameForObject(FADC_ELENAME, s, d, p), 200, 0.0, 4000.0);
@@ -94,8 +102,6 @@ public class CalibrationRun {
             }
         }
     }
-    
-    
 
     // naming convention
     private String nameForObject(String baseName, int sector, int side, int segment) {
