@@ -10,7 +10,7 @@ public class CalibrationRun {
     private static final int NSECTORS = 6;
     private static final int NSIDES = 2;
     private static final int NSEGMENTS = 18;
- //   private static final int[] ACTIVESECTORS = {0, 1, 1, 0, 1, 1};
+    //   private static final int[] ACTIVESECTORS = {0, 1, 1, 0, 1, 1};
 
     // calibration constants from DB
     private CalibrationConstants speCalib = null;
@@ -25,8 +25,8 @@ public class CalibrationRun {
     private static final String[] SPE_HISTONAMES = {FADC_ALLNAME, FADC_RNDNAME, FADC_ELENAME, FADC_PIONAME};
     private static final int[] SPE_HISTOSMAXS = {1000, 1000, 4000, 4000};
 
-    // histo vectors. Index is 4 coordinate
-    private IndexedList<H1F> speHistos = new IndexedList<>(4);
+    // histo vectors. First index is histo name, indexes 2,3,4 are sector, side, pmt 
+    private IndexedList<H1F> speHistos = new IndexedList<>(SPE_HISTONAMES.length);
 
 //    // histo storing the fit parameters
 //    private static final String FITPARS_HNAME = "fitpars";
@@ -75,11 +75,20 @@ public class CalibrationRun {
             }
         }
     }
-    
-    
+
     // get wanted histogram from sector, side, pmt number 
     public H1F getHisto(String name, int s, int d, int p) {
-        
+        return speHistos.getItem(histoIndex(name), s, d, p);
+
+    }
+
+    private int histoIndex(String name) {
+        for (int h = 0; h < SPE_HISTONAMES.length; h++) {
+            if (name.equals(SPE_HISTONAMES[h])) {
+                return h;
+            }
+        }
+        return 0;
     }
 
     // naming convention
