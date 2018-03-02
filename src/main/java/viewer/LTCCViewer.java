@@ -14,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 
+// ltcc 
+import modules.CalibrationData;
+
 /**
  * @author ungaro
  */
@@ -27,6 +30,8 @@ public final class LTCCViewer implements ActionListener {
 
     // include mode 1 analysis
     private boolean analyzeMode1 = false;
+
+    CalibrationData calibData;
 
 // constructor: menubar items
     public LTCCViewer() {
@@ -51,10 +56,12 @@ public final class LTCCViewer implements ActionListener {
         menuBar.add(settingsMenu);
 
         // Save Data Group
-        JMenu dataGroupIO = new JMenu("DataGroupIO");
-        dataGroupIO.add(createMenuItem("Save Datagroup", "Save all datagroup objects like histos, etc", KeyEvent.VK_D));
-        dataGroupIO.add(createMenuItem("Load Datagroup", "Load all datagroup objects like histos, etc", KeyEvent.VK_R));
+        JMenu dataGroupIO = new JMenu("Histos IO");
+        dataGroupIO.add(createMenuItem("Save Histos", "Save all Histos for the current run", KeyEvent.VK_D));
+        dataGroupIO.add(createMenuItem("Load Histos", "Load all Histos from a run file", KeyEvent.VK_R));
         menuBar.add(dataGroupIO);
+
+        calibData = new CalibrationData();
 
     }
 
@@ -85,7 +92,7 @@ public final class LTCCViewer implements ActionListener {
 
         //frame.add(viewer.getPanel());
         frame.add(ltccViewer.mainPanel);
-        
+
         frame.setJMenuBar(ltccViewer.menuBar);
         frame.setSize(1400, 800);
         frame.setVisible(true);

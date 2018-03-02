@@ -52,6 +52,7 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
     private JSplitPane moduleView = null;
     private EmbeddedCanvas canvas = null;
     private CalibrationConstantsView ccview = null;
+   
     private int nProcessed = 0;
     private int nLayers;
     private int nSegments;
@@ -167,11 +168,12 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         
         ccview = new CalibrationConstantsView();
         ccview.addConstants(this.getCalibrationConstants().get(0), this);
-
-        moduleView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+ 
         canvas = new EmbeddedCanvas();
         canvas.initTimer(4000);
 
+        moduleView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+ 
         moduleView.setTopComponent(canvas);
         moduleView.setBottomComponent(ccview);
         moduleView.setDividerLocation(0.75);

@@ -20,19 +20,12 @@ public class SPEModule extends CalibrationModule {
         super(d, name, "mean:mean_e:sigma:sigma_e");
     }
 
-    CalibrationData calibData;
 
     // define histos
     @Override
     public void resetEventListener() {
-        calibData = new CalibrationData();
-        calibData.addRun(10);
     }
 
-    @Override
-    public void analyze() {
-
-    }
 
     // decide what's get plotted in the canvas at the button click
     @Override
@@ -40,9 +33,5 @@ public class SPEModule extends CalibrationModule {
 
     }
 
-    @Override
-    public void timerUpdate() {
-        analyze();
-    }
 
 }
