@@ -7,6 +7,7 @@ package modules;
 
 import view.DetectorShape2D;
 import viewer.CalibrationModule;
+import viewer.CCDetector;
 
 // for mode help on groot:
 // https://github.com/gavalian/groot

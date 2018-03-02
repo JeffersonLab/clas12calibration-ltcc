@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JFrame;
 
 /**
  * @author ungaro
@@ -75,4 +76,19 @@ public final class LTCCViewer implements ActionListener {
         }
     }
 
+    // application main
+    // netbeans runs a file if it has a main
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("LTCC Calibration");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        LTCCViewer ltccViewer = new LTCCViewer();
+
+        //frame.add(viewer.getPanel());
+        frame.add(ltccViewer.mainPanel);
+        
+        frame.setJMenuBar(ltccViewer.menuBar);
+        frame.setSize(1400, 800);
+        frame.setVisible(true);
+
+    }
 }
