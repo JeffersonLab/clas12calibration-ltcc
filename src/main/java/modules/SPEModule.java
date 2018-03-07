@@ -6,25 +6,18 @@
 package modules;
 
 import view.DetectorShape2D;
-import viewer.CalibrationModule;
-import viewer.CCDetector;
 
 // for mode help on groot:
 // https://github.com/gavalian/groot
 /**
  * @author ungaro
  */
-public class SPEModule extends CalibrationModule {
+public class SPEModule extends ModuleViewController {
 
-    public SPEModule(CCDetector d, String name) {
-        super(d, name, "mean:mean_e:sigma:sigma_e");
+    public SPEModule(String name) {
+        super(name);
     }
 
-
-    // define histos
-    @Override
-    public void resetEventListener() {
-    }
 
 
     // decide what's get plotted in the canvas at the button click

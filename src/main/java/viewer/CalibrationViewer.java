@@ -124,7 +124,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
 
         LTCCPulses ltccPulses = new LTCCPulses(detectorView, "Mode 1");
 
-        SPEModule speModule = new SPEModule(detectorView, "SPEModule");
+      //  SPEModule speModule = new SPEModule(detectorView, "SPEModule");
         
         // create module viewer: each of these is on one tab
         //modules.add(new TimeCalibration(detectorView, "TimeCalibration"));
@@ -132,7 +132,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         modules.add(speS);
         modules.add(pmtOccupancy);
         modules.add(ltccPulses);
-        modules.add(speModule);
+        //modules.add(speModule);
 
         modulePanel = new JTabbedPane();
         for (int k = 0; k < modules.size(); k++) {
