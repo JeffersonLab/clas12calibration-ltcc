@@ -1,0 +1,5 @@
+10/5/18
+
+- modified sector 5 17 and 18 right to test if the L/R are swapped
+
+
