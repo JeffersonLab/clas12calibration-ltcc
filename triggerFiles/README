@@ -32,11 +32,38 @@ The file loaded by ltcc_calib_random.trg is ltcc_calib.cnf which in turns loads:
 Masks are ignored in internal pulser mode.
 Currently various is removed because it is in ltcc_calib_random.trg
 
+
+Procedure:
+----------
+
+1. Edit ltcc_calib_threshold.conf
+
+scp ltcc_calib_thresholds.cnf ftp:
+
+2. as clasrun, in $CLON_PARMS/trigger/LTCC:
+
+scp ungaro@ftp:ltcc_calib_thresholds.cnf .
+
+
 Data
 ----
 
 In: clondaq6
 Directory: /data/stage_in/
+
+
+ET Ring:
+--------
+
+To check which clondaq has the ET ring, use daqvnc.
+
+One can run the calibration suite from clondaq3 (verify?)
+
+In /home/clasrun/LTCC/clas12calibration-ltcc:
+
+./runLTCCCalib.sh
+
+
 
 
 Checks
