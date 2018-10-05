@@ -40,5 +40,5 @@ mktbl hv -r 216 sector=int layer=int component=int hv=r
 
 -r run range
 
-add hv -r 0-2147483647 LTCC_HV.txt
+add hv -r 4934-2147483647 LTCC_HV-4934.txt
 
