@@ -5,12 +5,10 @@ Save the spe file in ltccCalibrationData/spe/2018
 
 Upload after edit:
 
-setenv CCDB_CONNECTION mysql://clas12writer:geom3try@clasdb/clas12
 
-ccdb -i
+ccdb -i -c mysql://clas12writer:geom3try@clasdb/clas12
 
 cd /calibration/ltcc
-
 
 To add data:
 
