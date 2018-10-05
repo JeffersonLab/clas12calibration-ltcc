@@ -1,0 +1,10 @@
+
+
+10/5/18
+
+- Sector 5 slow control HV still swapped L/R
+- LTCC_HV-2018_10_05-09_21_20.snp saved as run 4781
+- After adjustment LTCC_HV-2018_10_05-09_39_11.snp saved as run 4934
+
+
+

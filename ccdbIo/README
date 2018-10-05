@@ -1,13 +1,22 @@
-* The output of the script is the LTCC_HV.txt file.
+Currently we can't interact with the SPE values in the suite by re-doing the fit.
+So we save the constants (Constants > Save) and then we edit the file.
 
-* The LTCC_HV.txt file contains a table with sector, side, component and HV information. 
+Save the spe file in ltccCalibrationData/spe/2018
 
-* To upload it to the ccdb: 
+Upload after edit:
 
-    ** The command to create a table 
-    
-       ccdb -c mysql://clas12writer:geom3try@clasdb/clas12 mktbl /test/cc_calib/ltcc/ltcchv -r 180 sector=int side=int component=int hv=double #ltcc table
+setenv CCDB_CONNECTION mysql://clas12writer:geom3try@clasdb/clas12
 
-    ** To add the text file to that table:
+ccdb -i
 
-       ccdb -c mysql://clas12writer:geom3try@clasdb/clas12 -v mc add test/cc_calib/ltcc LTCC_HV.txt
+cd /calibration/ltcc
+
+
+To add data:
+
+cd ltccCalibrationData/spe/2018
+
+add spe -r 4781-2147483647 4781.txt
+
+
+

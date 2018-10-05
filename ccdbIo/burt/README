@@ -1,7 +1,6 @@
-
 * The location of the burt files:
 
-* /usr/clas12/DATA/burt
+* /usr/clas12/DATA/burt/LTCC_HV
 
 * More burt files can be obtained by following the steps below:
 
@@ -16,3 +15,30 @@
     ** Click on OK on the small screen that pops up.
 
     
+Currently the HV are changed by hand. These instructions explain how to save the HV values on CCDB.
+
+ATTENTION: CURRENTLY SECTOR 5 LEFT AND RIGHT IN SLOW CONTROL ARE SWITCHED
+ATTENTION: CURRENTLY SECTOR 3 LEFT AND RIGHT IN SLOW CONTROL ARE SWITCHED
+#########################################################################
+
+
+1. Save the HV onto a burt file.
+2. Run LTCC_HV.sh on it.
+3. The output of LTCC_HV.sh is a LTCC_HV.txt file: a table with sector, side, component and HV information.
+4. To upload it to the ccdb:
+* The command to create the table
+
+ccdb -i -c mysql://clas12writer:geom3try@clasdb/clas12
+
+cd /calibration/ltcc
+
+-r: number of rows
+
+mktbl hv -r 216 sector=int layer=int component=int hv=r
+
+* To add the text file to that table:
+
+-r run range
+
+add hv -r 0-2147483647 LTCC_HV.txt
+
