@@ -52,7 +52,6 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
     private JSplitPane moduleView = null;
     private EmbeddedCanvas canvas = null;
     private CalibrationConstantsView ccview = null;
-   
     private int nProcessed = 0;
     private int nLayers;
     private int nSegments;
@@ -73,11 +72,9 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
     @Override
     public void constantsEvent(CalibrationConstants cc, int col, int row) {
         System.out.println("Well. it's working " + col + "  " + row);
-        
         String str_sector = (String) cc.getValueAt(row, 0);
         String str_layer = (String) cc.getValueAt(row, 1);
         String str_component = (String) cc.getValueAt(row, 2);
-        
         System.out.println(str_sector + " " + str_layer + " " + str_component);
         IndexedList<DataGroup> group = this.getDataGroup();
 
@@ -158,22 +155,19 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         this.moduleName = name;
         this.nProcessed = 0;
         // create calibration constants viewer
-        
+        ccview = new CalibrationConstantsView();
         this.calib = new CalibrationConstants(3, Constants);
         this.calib.setName(name);
         this.calib.setPrecision(2);
-        
-        
-        
-        
-        ccview = new CalibrationConstantsView();
+        this.prevCalib = new CalibrationConstants(3, Constants);
+        this.prevCalib.setName(name);
+        this.prevCalib.setPrecision(2);
         ccview.addConstants(this.getCalibrationConstants().get(0), this);
- 
+
+        moduleView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         canvas = new EmbeddedCanvas();
         canvas.initTimer(4000);
 
-        moduleView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
- 
         moduleView.setTopComponent(canvas);
         moduleView.setBottomComponent(ccview);
         moduleView.setDividerLocation(0.75);
