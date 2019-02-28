@@ -1,3 +1,18 @@
+SPE
+---
+
+set RUN=6213
+
+setenv CCDB_CONNECTION mysql://clas12writer:geom3try@clasdb/clas12
+ccdb add  /calibration/ltcc/spe -r $RUN"-"  $RUN".txt"
+
+
+
+
+
+High Voltages
+-------------
+
 * The output of the script is the LTCC_HV.txt file.
 
 * The LTCC_HV.txt file contains a table with sector, side, component and HV information. 
