@@ -1,10 +1,11 @@
 SPE
 ---
 
-set RUN=6213
+set RUN=6141-
+set FILE=6213.txt
 
 setenv CCDB_CONNECTION mysql://clas12writer:geom3try@clasdb/clas12
-ccdb add  /calibration/ltcc/spe -r $RUN"-"  $RUN".txt"
+ccdb add  /calibration/ltcc/spe -r $RUN  $FILE
 
 
 
