@@ -8,7 +8,7 @@ The trigger files are located in
 
 $CLON_PARMS/trigger/LTCC
 
-To run the LTCC calibration, use the random trigger.
+To run the LTCC calibration, we can use the random trigger but it's better to use the data (with pre-scale trigger in it.)
 
 DAQ can be accessed with vnc from clonsl2
 
@@ -17,9 +17,21 @@ daqvnc
 DAQ configuration for normal trigger
 ------------------------------------
 
-ltcc_defaults.cnf
+ltcc_default.cnf
 
 Loaded from?
+
+Procedure for normal trigger:
+-----------------------------
+
+1. Edit ltcc_defaults.cnf
+
+scp ltcc_default.cnf ftp:
+
+2. as clasrun:
+
+cd $CLON_PARMS/trigger/LTCC
+scp ungaro@ftp:ltcc_default.cnf .
 
 
 DAQ configuration for random trigger
@@ -42,8 +54,8 @@ Masks are ignored in internal pulser mode.
 Currently various is removed because it is in ltcc_calib_random.trg
 
 
-Procedure:
-----------
+Procedure for random trigger:
+-----------------------------
 
 1. Edit ltcc_calib_threshold.conf
 
@@ -71,8 +83,6 @@ One can run the calibration suite from clondaq3 (verify?)
 
 cd /home/clasrun/LTCC/clas12calibration-ltcc
 ./runLTCCCalib.sh
-
-
 
 
 Checks
