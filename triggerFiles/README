@@ -6,7 +6,7 @@ The trigger files are located in
 
 $CLON_PARMS/trigger/LTCC
 
-To run the LTCC calibration, use the random trigger.
+To run the LTCC calibration, we can use the random trigger but it's better to use the data (with pre-scale trigger in it.)
 
 DAQ can be accessed with vnc from clonsl2
 
@@ -49,7 +49,4 @@ fadc250 adcecal5 mon 18
 tcpClient adcecal2 fadc250UploadAllPrint
 tcpClient adcecal2 tdc1190UploadAllPrint
 tcpClient trig1 tsStatus
-
-
-
 

@@ -11,8 +11,9 @@ ccdb add  /calibration/ltcc/spe -r $RUN  $FILE
 
 
 
-High Voltages
--------------
+High Voltages TO CCDB
+---------------------
+
 
 * The output of the script is the LTCC_HV.txt file.
 
