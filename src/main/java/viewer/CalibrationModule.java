@@ -312,15 +312,26 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
             File outputFile = new File(filename);
             FileWriter outputFw = new FileWriter(outputFile.getAbsoluteFile());
             BufferedWriter outputBw = new BufferedWriter(outputFw);
-
+            
             for (int i = 0; i < calib.getRowCount(); i++) {
                 
                 String line = new String();
-
+               
                 // for SPE we're only interested in mean and sigma
                 for (int j = 0; j < calib.getColumnCount(); j++) {
                     if (j != 4 && j != 6) {
-                        line = line + calib.getValueAt(i, j);
+                        if (j==1) {
+                            int correctLayerNumberToPrint;
+                            if (calib.getValueAt(i, j).equals("0")) {
+                                correctLayerNumberToPrint = 1;
+                             }
+                             else {
+                                correctLayerNumberToPrint = 2;
+                            }   
+                            line = line + correctLayerNumberToPrint;
+                        } else {
+                            line = line + calib.getValueAt(i, j);
+                        }
                         if (j < calib.getColumnCount() - 1) {
                             line = line + " ";
                         }
