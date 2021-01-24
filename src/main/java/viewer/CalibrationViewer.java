@@ -93,6 +93,7 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
         JMenu constantsMenu = new JMenu("Constants");
         constantsMenu.add(createMenuItem("Load Constants", "Load Constants from file", KeyEvent.VK_L));
         constantsMenu.add(createMenuItem("Save Constants", "Save Constants to file", KeyEvent.VK_S));
+        constantsMenu.add(createMenuItem("Adjust fit", "Adjust fit and range", KeyEvent.VK_A));
         menuBar.add(constantsMenu);
 
         // Settings
@@ -268,6 +269,15 @@ public final class CalibrationViewer implements IDataEventListener, ActionListen
                     this.modules.get(k).saveConstants(dirName);
                 }
             }
+        }
+        if ("Adjust fit".equals(e.getActionCommand())) {
+            System.out.println("Adjust fit selected...");
+            for(int k=0; k<this.modules.size(); k++) {
+                if(this.modules.get(k).getName()==moduleSelect) {
+                    //System.out.println("Adjusting fit for module "+k);
+                    this.modules.get(k).adjustFit();
+                }
+            } 
         }
     }
 

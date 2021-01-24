@@ -258,7 +258,18 @@ public class SPECalibration extends CalibrationModule {
 //    public void timerUpdate() {
 //        analyze();
 //    }
-
+@Override
+    public void adjustFit() {
+        System.out.println("--> adjustFit in the SPECalibration. But I don't know what to do now");
+//        int sector = this.getSelectedKey().getDescriptor().getSector();
+//        int layer  = this.getSelectedKey().getDescriptor().getLayer();
+//        int comp   = this.getSelectedKey().getDescriptor().getComponent();
+//        System.out.println("Adjusting fit for sector " + sector + ", layer " + layer + ", component " + comp);
+//        H1F htime = this.getDataGroup().getItem(sector,layer,comp).getH1F("htime_" + sector + "_" + layer + "_" + comp);
+//        F1D ftime = this.getDataGroup().getItem(sector,layer,comp).getF1D("ftime_" + sector + "_" + layer + "_" + comp);
+//        AdjustFit cfit = new AdjustFit(htime, ftime, "LRQ");
+//        this.getCanvas().update();
+    }
     private void initPoissonExpoPars(poissonExpo function, H1F histo) {
 
         double hAmp = histo.getBinContent(histo.getMaximumBin());

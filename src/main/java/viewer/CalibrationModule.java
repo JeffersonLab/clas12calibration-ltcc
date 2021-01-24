@@ -260,6 +260,11 @@ public class CalibrationModule extends CalibrationEngine implements CalibrationC
         }
     }
 
+    
+    public void adjustFit() {
+        System.out.println("Option not implemented in current module.");
+    }
+    
     public void processEvent(DataEvent event) {
     }
 
