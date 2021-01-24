@@ -68,11 +68,17 @@ public class SPECalibration extends CalibrationModule {
                     H1F fitparsDB = new H1F("fitparsDB_" + iSect + "_" + iSide + "_" + iComp, 5, 0.0, 5.0);
 
                     // gaussian fit function
-                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma])", 50, 800);
-//                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma]) + [e0]*exp(-x*[e1])", 50, 600);
-                    gaussianFit.setLineColor(3);
+//                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma])", 50, 800);
+                    //F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*gaus(x,[mean],[sigma]) + [e0]*exp(-x*[e1])", 50, 600);
+                    
+                    // expo landau fit, still keep old "gaussianFit" name until is final decision
+                    F1D gaussianFit = new F1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp, "[amp]*landau(x,[mean],[sigma]) + [e0]*exp(-x*[e1])", 80, 600);
+                    
+                    
+                    gaussianFit.setLineColor(5);
                     gaussianFit.setLineWidth(2);
-
+                    double[] initG={100., 200., 30., 20., 20.};
+                    gaussianFit.setParameters(initG);
                     DataGroup dg = new DataGroup(6, 3);
                     dg.addDataSet(speADC, 0);
                     dg.addDataSet(fitpars, 0);   // added fit parameters histo to the datagroup
@@ -149,17 +155,22 @@ public class SPECalibration extends CalibrationModule {
                     H1F speADC = this.getHistogramFromDataDataGroup("speADC_", iSect, iSide, iComp);
 
                     F1D gaussianFit = this.getDataGroup().getItem(iSect, iSide, iComp).getF1D("gaussianFit" + iSect + "_" + iSide + "_" + iComp);
-                    this.initTimeGaussFitPar(gaussianFit, speADC);
-
+//                    this.initTimeGaussFitPar(gaussianFit, speADC);
+                 
                     // only fit if there are 100 events or more
                     int minEntries = 0;
                     for (int b = 0; b < 50; b++) {
                         minEntries += speADC.getBinContent(b);
                     }
 
-                    System.out.println(minEntries);
-
+                    //System.out.println(minEntries);
+                    
+                    // Param Init
+                   
+                    
+                    
                     if (minEntries > 100) {
+                       this.initLandauExpoFitPar(gaussianFit, speADC);  
                         DataFitter.fit(gaussianFit, speADC, "LQ");
                         updateCalibration(iSect, iSide, iComp);
                     }
@@ -243,10 +254,10 @@ public class SPECalibration extends CalibrationModule {
         return col;
     }
 
-    @Override
-    public void timerUpdate() {
-        analyze();
-    }
+//    @Override
+//    public void timerUpdate() {
+//        analyze();
+//    }
 
     private void initPoissonExpoPars(poissonExpo function, H1F histo) {
 
@@ -336,6 +347,81 @@ public class SPECalibration extends CalibrationModule {
 //        System.out.println("gauss parameter 1 " + function.getParameter(1) + " min: " + par1Min + " max: " + par1Max);
 //        System.out.println("gauss parameter 2 " + function.getParameter(2) + " min: " + par2Min + " max: " + par2Max);
     }
+    
+    private void initLandauExpoFitPar(F1D function, H1F histo) {
+
+        // init the Landau mean from mean value of the histogram in a range between 100 and 500
+        double infADC   = 100;
+        double supADC = 500;
+        double binCount = 0;
+        double meanADC = 0;
+        double maxADC = 0;
+        int binWithMax = 0;
+        double sumSq = 0;
+        double binValueSum = 0; 
+        
+        for (int i = 0; i<histo.getAxis().getNBins(); i++) {
+            
+            double binCenter = histo.getXaxis().getBinCenter(i);
+            double binValue = histo.getBinContent(i);
+            
+            if ( (binCenter>infADC) && (binCenter<supADC)) {
+                binValueSum += binValue ;
+                meanADC += binCenter * binValue ;
+                if (binValue > maxADC) {
+                    maxADC = binValue;
+                    binWithMax = i ;
+                }
+                binCount++;
+            }
+        }
+        if (binCount>0) {
+            meanADC = meanADC / binValueSum ; // weight. average
+        }
+        // now the mean is known -> compute RMS
+        for (int i = 0; i<histo.getAxis().getNBins(); i++) {
+            // get bin position and content
+            double bc = histo.getXaxis().getBinCenter(i);
+            double bValue = histo.getBinContent(i);
+            if ( (bc>infADC) && (bc<supADC)) {
+              double variance = bc - meanADC ;
+              sumSq += variance*variance*bValue ;
+            }
+        }
+        double rmsADC = 0;
+        if (binCount>0) {
+            rmsADC = Math.sqrt(sumSq / binValueSum) ;
+        }
+        
+    
+        // LandaExpo params are landau: [0]Amp, [1]mean, [2]sig
+        double[] parValue = new double[5];
+        double[] parMin = new double[5];
+        double[] parMax = new double[5];
+        
+        parValue[0] = maxADC;
+        parMin[0] = parValue[0]*0.7;
+        parMax[0] = parValue[0]*1.3;
+
+        parValue[1] = meanADC;
+        parMin[1] = parValue[1]*0.7;
+        parMax[1] = parValue[1]*1.3;
+
+        parValue[2] = rmsADC;
+        parMin[2] = parValue[2]*0.01;
+        parMax[2] = parValue[2]*5;
+
+        parValue[3] = 20;
+        parValue[4] = 20;
+        for (int i=0; i<5; i++) {
+            function.setParameter(i, parValue[i]);
+            if (i< 3) {
+                function.setParLimits(i, parMin[i], parMax[i]);
+                System.out.println("init LandauExpo parameter " + i + " " + parValue[i] + " min: " + parMin[i] + " max: " + parMax[i]);
+            }
+        }
+    }
+    
 
     private void updateCalibration(int sector, int side, int paddle) {
 

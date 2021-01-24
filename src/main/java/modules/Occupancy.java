@@ -81,7 +81,7 @@ public class Occupancy extends CalibrationModule {
     }
 
     public void analyze() {
-        System.out.println("Analyzing");
+        //System.out.println("Analyzing");
 
         for (int iSect : this.getDetector().getSectors()) {
             // order indicate left (0) / right (1)
