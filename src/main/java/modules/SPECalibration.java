@@ -147,7 +147,7 @@ public class SPECalibration extends CalibrationModule {
     @Override
     public void analyze() {
 //        System.out.println("Analyzing");
-
+        
         for (int iSect : this.getDetector().getSectors()) {
             for (int iSide = 0; iSide < 2; iSide++) {
                 for (int iComp = 1; iComp <= this.getSegments(); iComp++) {
@@ -411,8 +411,8 @@ public class SPECalibration extends CalibrationModule {
         double[] parMax = new double[5];
         
         parValue[0] = maxADC;
-        parMin[0] = parValue[0]*0.7;
-        parMax[0] = parValue[0]*1.3;
+        parMin[0] = parValue[0]*0.5;
+        parMax[0] = parValue[0]*20;
 
         parValue[1] = meanADC;
         parMin[1] = parValue[1]*0.7;
@@ -423,13 +423,17 @@ public class SPECalibration extends CalibrationModule {
         parMax[2] = parValue[2]*5;
 
         parValue[3] = 20;
-        parValue[4] = 20;
+        parMin[3] = parValue[3]*0.01;
+        parMax[3] = parValue[3]*10;
+        
+         parValue[4] = 20;
+        parMin[4] = parValue[4]*0.01;
+        parMax[4] = parValue[4]*10;
+        
         for (int i=0; i<5; i++) {
             function.setParameter(i, parValue[i]);
-            if (i< 3) {
-                function.setParLimits(i, parMin[i], parMax[i]);
-                System.out.println("init LandauExpo parameter " + i + " " + parValue[i] + " min: " + parMin[i] + " max: " + parMax[i]);
-            }
+            function.setParLimits(i, parMin[i], parMax[i]);
+          //  System.out.println("init LandauExpo parameter " + i + " " + parValue[i] + " min: " + parMin[i] + " max: " + parMax[i]);
         }
     }
     
@@ -438,7 +442,7 @@ public class SPECalibration extends CalibrationModule {
 
         if (sector != 1 && sector != 4) {
             F1D gaussianFit = this.getDataGroup().getItem(sector, side, paddle).getF1D("gaussianFit" + sector + "_" + side + "_" + paddle);
-
+            
             double mean = gaussianFit.parameter(1).value();
             double mean_e = gaussianFit.parameter(1).error();
             double sigma = gaussianFit.parameter(2).value();

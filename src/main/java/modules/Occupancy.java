@@ -112,7 +112,7 @@ public class Occupancy extends CalibrationModule {
         int order = layer - 1;
         int paddle = dsd.getDescriptor().getComponent();
         int pmtIndex = (order * 18) + paddle;
-        System.out.println("Selected shape " + sector + " " + pmtIndex);
+        //System.out.println("Selected shape " + sector + " " + pmtIndex);
         IndexedList<DataGroup> group = this.getDataGroup();
 
         this.getCanvas().divide(2, 2);

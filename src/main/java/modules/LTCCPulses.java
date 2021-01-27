@@ -143,7 +143,7 @@ public class LTCCPulses extends CalibrationModule {
 
                 H1F normalizedPulse = ltccPulse.histClone("normalized");
 
-                System.out.println(" sector " + sector + "   side " + side + " pmt " + paddle + " entries: " + ltccPulse.getEntries() / 100);
+                //System.out.println(" sector " + sector + "   side " + side + " pmt " + paddle + " entries: " + ltccPulse.getEntries() / 100);
 
                 //   every event gives 100 entries 
 //                if (ltccPulse.getEntries() > 0) {
